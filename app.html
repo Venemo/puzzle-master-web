@@ -2,23 +2,24 @@
 <html>
 <head>
     <title>Puzzle Master</title>
-    <script src="jquery-2.0.3.min.js"></script>
-    <script type="text/javascript" src="app.js"></script>
-    <style type="text/css">
-        body {
-            background: #dedede;
-        }
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-    </style>
+    <link rel="stylesheet" href="css/app.css" />
+    <script src="js/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
+    
 </head>
 <body>
     
     <canvas id="maincanvas">
     </canvas>
+    
+    <div id="main-ui">
+        
+    </div>
+    
+    <div id="loading-ui">
+        Loading...
+    </div>
+    
     <script id="pm-vertex-shader" type="x-shader/x-vertex">
         attribute vec2 a_position;
         attribute vec2 a_texCoord;

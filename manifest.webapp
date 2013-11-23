@@ -1,0 +1,17 @@
+{
+  "version": "1",
+  "name": "Puzzle Master",
+  "launch_path": "/app.html",
+  "description": "Fun jigsaw puzzle game",
+  "icons": {
+    "256": "/images/puzzle-master.png"
+  },
+  "developer": {
+    "name": "Timur Kristóf"
+  },
+  "installs_allowed_from": [
+    "*"
+  ],
+  "default_locale": "en",
+  "permissions": { }
+}

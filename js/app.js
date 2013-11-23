@@ -285,7 +285,7 @@ Helper = (function() {
             var promise = new $.Deferred();
             var image = new Image();
             
-            image.src = "image4.jpg";
+            image.src = url;
             image.onload = function() {
                 promise.resolve(image);
             };
@@ -329,6 +329,7 @@ Helper = (function() {
 })();
 
 $(function() {
+    console.log("starting app");
     
     // Find stuff
     var $window = $(window);
@@ -338,6 +339,8 @@ $(function() {
     // Initialize stuff
     canvas.width = $window.width();
     canvas.height = $window.height();
+    
+    console.log("initialize done");
     
     // Get GL context
     var gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
@@ -352,7 +355,7 @@ $(function() {
     };
     
     // Load an image
-    PM.helper.loadImage("image4.jpg").done(function(image) {
+    PM.helper.loadImage("images/image4.jpg").done(function(image) {
         
         // setup a GLSL program
         var vertexShader = $("#pm-vertex-shader").getShader(gl);
@@ -398,14 +401,41 @@ $(function() {
         var game = new Game(gl, shaderProgram);
         game.start(image, rows, cols);
         
-        $canvas.on("mousedown.pm", function (e) {
-            game.reactToMouseDown({ x: e.clientX, y: e.clientY });
+        canvas.addEventListener("touchstart", function (e) {
+            console.log("touchstart!");
+            game.reactToMouseDown({ x: e.pageX, y: e.pageY });
         });
-        $canvas.on("mouseup.pm", function (e) {
-            game.reactToMouseUp({ x: e.clientX, y: e.clientY });
+        canvas.addEventListener("touchend", function (e) {
+            console.log("touchend!");
+            game.reactToMouseUp({ x: e.pageX, y: e.pageY });
         });
-        $canvas.on("mousemove.pm", function (e) {
-            game.reactToMouseMove({ x: e.clientX, y: e.clientY });
+        canvas.addEventListener("touchmove", function (e) {
+            //console.log("touchstart!");
+            game.reactToMouseMove({ x: e.pageX, y: e.pageY });
         });
+        canvas.addEventListener("mousedown", function (e) {
+            console.log("mousedown!");
+            game.reactToMouseDown({ x: e.pageX, y: e.pageY });
+        });
+        canvas.addEventListener("mouseup", function (e) {
+            console.log("mouseup!");
+            game.reactToMouseUp({ x: e.pageX, y: e.pageY });
+        });
+        canvas.addEventListener("mousemove", function (e) {
+            //console.log("touchstart!");
+            game.reactToMouseMove({ x: e.pageX, y: e.pageY });
+        });
+        
+//        $canvas.on("touchstart.pm", function (e) {
+//            game.reactToMouseDown({ x: e.clientX, y: e.clientY });
+//        });
+//        $canvas.on("touchend.pm", function (e) {
+//            game.reactToMouseUp({ x: e.clientX, y: e.clientY });
+//        });
+//        $canvas.on("touchmove.pm", function (e) {
+//            game.reactToMouseMove({ x: e.clientX, y: e.clientY });
+//        });
+        
+        $("#loading-ui").hide();
     });
 });

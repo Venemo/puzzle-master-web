@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <title>Puzzle Master</title>
     <link rel="stylesheet" href="css/app.css" />
-    <script src="js/jquery-2.0.3.min.js"></script>
-    <script type="text/javascript" src="js/app.js"></script>
     
 </head>
 <body>
@@ -16,166 +15,57 @@
         
     </div>
     
-    <div id="loading-ui">
-        Loading...
-    </div>
-    
-    <script id="pm-vertex-shader" type="x-shader/x-vertex">
-        attribute vec2 a_position;
-        attribute vec2 a_texCoord;
-
-        uniform vec2 u_resolution;
-
-        varying vec2 v_texCoord;
-
-        void main() {
-           // convert the rectangle from pixels to 0.0 to 1.0
-           vec2 zeroToOne = a_position / u_resolution;
-
-           // convert from 0->1 to 0->2
-           vec2 zeroToTwo = zeroToOne * 2.0;
-
-           // convert from 0->2 to -1->+1 (clipspace)
-           vec2 clipSpace = zeroToTwo - 1.0;
-
-           gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
-
-           // pass the texCoord to the fragment shader
-           // The GPU will interpolate this value between points.
-           v_texCoord = a_texCoord;
-           
-        }
-    </script>
-    <script id="pm-fragment-shader" type="x-shader/x-fragment">    
-        // Tab statuses
-        #define TAB_BOTTOM_TAB       1
-        #define TAB_BOTTOM_BLANK     2
-        #define TAB_TOP_TAB          4
-        #define TAB_TOP_BLANK        8
-        #define TAB_LEFT_TAB        16
-        #define TAB_LEFT_BLANK      32
-        #define TAB_RIGHT_TAB       64
-        #define TAB_RIGHT_BLANK    128
+    <script src="js/piece.js"></script>
+    <script src="js/game.js"></script>
+    <script>
+        var mainCanvas = document.getElementById("maincanvas");
+        mainCanvas.width = document.documentElement.clientWidth;
+        mainCanvas.height = document.documentElement.clientHeight;
         
-        // Precision
-        precision mediump float;
-
-        // our texture
-        uniform sampler2D u_image;
+        var image = new Image();
         
-        // Things
-        uniform vec2 u_resolution;
-        uniform vec2 u_imageSize;
-        uniform vec2 u_puzzleSize;
-        uniform int u_pieces[50];
-        uniform float u_piecesPos[50];
-        uniform float u_piecesRot[50];
-        uniform float u_piecesRotOrig[50];
-        uniform int u_piecesTabs[100];
-        uniform int u_nPieces;
+        image.src = "images/image4.jpg";
+        image.onload = function() {
+            var ctx = mainCanvas.getContext("2d");
+            var isDirty = true, stopLoop = true;
+            
+            var game = new PM.Game(image, 2, 3, function() {
+                isDirty = true;
+            });
+            
+            ctx.drawImage(image, 0, 0);
+            
+            var drawLoop = function() {
+                mozRequestAnimationFrame(function() {
+                    if (isDirty) {
+                        game.draw(ctx);
+                        isDirty = false;
+                    }
+                    //if (!stopLoop) {
+                    //    drawLoop();
+                    //}
+                    drawLoop();
+                });
+            };
+            drawLoop();
+            
+            
+            mainCanvas.addEventListener("touchstart", function (e) {
+                game.reactToTouchStart(e.touches);
+                isDirty = true;
+                //drawLoop();
+            });
+            mainCanvas.addEventListener("touchend", function (e) {
+                game.reactToTouchEnd(e.touches);
+                isDirty = true;
+                //stopLoop = true;
+            });
+            mainCanvas.addEventListener("touchmove", function (e) {
+                game.reactToTouchMove(e.touches);
+                isDirty = true;
+            });
+        };
         
-        #define M_PI 3.1415926535897932384626433832795
-
-        // the texCoords passed in from the vertex shader.
-        varying vec2 v_texCoord;
-        
-        // Transforms item coordinates to scene coordinates
-        vec2 mapToScene(vec2 pos, vec2 p0, vec2 o, float angle) {
-            vec2 p = p0 - o;
-            vec2 r = vec2(p.x * cos(-angle) + p.y * sin(-angle), -p.x * sin(-angle) + p.y * cos(-angle));
-            
-            return pos + r + o;
-        }
-        
-        // Transforms scene coordinates to item coordinates
-        vec2 mapFromScene(vec2 pos, vec2 p0, vec2 o, float angle) {
-            vec2 p = p0 - mapToScene(pos, o, o, angle);
-            vec2 r = vec2(p.x * cos(angle) + p.y * sin(angle), -p.x * sin(angle) + p.y * cos(angle));
-            
-            return r + o;
-        }
-        
-        // Tells if a point is in the given circle
-        bool isInCircle(vec2 pos, vec2 o, float r) {
-            float a = pos.x - o.x;
-            float b = pos.y - o.y;
-            a *= a;
-            b *= b;
-            
-            return a + b < r * r;
-        }
-
-        void main() {
-        
-            float x = v_texCoord.x * u_imageSize.x;
-            float y = v_texCoord.y * u_imageSize.y;
-            
-            float pieceW = u_imageSize.x / u_puzzleSize.x;
-            float pieceH = u_imageSize.y / u_puzzleSize.y;
-            
-            float tabSize = min(pieceW / 6.0, pieceH / 6.0);
-            float tabOffset = tabSize * 0.55;
-            
-            //gl_FragColor = vec4(0, 0, 0, 0);
-            vec4 vv = texture2D(u_image, v_texCoord);
-            gl_FragColor = vec4(vv.x, vv.y, vv.z, 0.5);
-            
-            for (int n = 0; n < 100; n++) {
-                if (n >= u_nPieces) {
-                    break;
-                }
-                
-                // Process nth puzzle piece
-                
-                // Get parameters from uniforms
-                int px = u_pieces[n * 2];
-                int py = u_pieces[n * 2 + 1];
-                float angle = u_piecesRot[n];
-                vec2 transformOrigin = vec2(u_piecesRotOrig[n * 2], u_piecesRotOrig[n * 2 + 1]);
-                vec2 position = vec2(u_piecesPos[n * 2], u_piecesPos[n * 2 + 1]);
-                
-                // Map current coordinates to scene
-                vec2 sp = mapFromScene(position, vec2(x, y), transformOrigin, angle);
-                
-                bool should = sp.x >= 0.0 && sp.x <= pieceW && sp.y >= 0.0 && sp.y <= pieceH;
-                
-                // Left tab
-                should = should || ((u_piecesTabs[n * 4 + 2] == TAB_LEFT_TAB) ? isInCircle(sp, vec2(-tabOffset, pieceH / 2.0), tabSize) : should);
-                // Left blank
-                should = should && (!(u_piecesTabs[n * 4 + 2] == TAB_LEFT_BLANK) || !isInCircle(sp, vec2(tabOffset, pieceH / 2.0), tabSize));
-                
-                // Right tab
-                should = should || ((u_piecesTabs[n * 4 + 3] == TAB_RIGHT_TAB) ? isInCircle(sp, vec2(pieceW + tabOffset, pieceH / 2.0), tabSize) : should);
-                // Right blank
-                should = should && (!(u_piecesTabs[n * 4 + 3] == TAB_RIGHT_BLANK) || !isInCircle(sp, vec2(pieceW - tabOffset, pieceH / 2.0), tabSize));
-                
-                // Top tab
-                should = should || ((u_piecesTabs[n * 4 + 0] == TAB_TOP_TAB) ? isInCircle(sp, vec2(pieceW / 2.0, -tabOffset), tabSize) : should);
-                // Top blank
-                should = should && (!(u_piecesTabs[n * 4 + 0] == TAB_TOP_BLANK) || !isInCircle(sp, vec2(pieceW / 2.0, tabOffset), tabSize));
-                
-                // Bottom tab
-                should = should || ((u_piecesTabs[n * 4 + 1] == TAB_BOTTOM_TAB) ? isInCircle(sp, vec2(pieceW / 2.0, pieceH + tabOffset), tabSize) : should);
-                // Bottom blank
-                should = should && (!(u_piecesTabs[n * 4 + 1] == TAB_BOTTOM_BLANK) || !isInCircle(sp, vec2(pieceW / 2.0, pieceH - tabOffset), tabSize));
-                
-                // Check if we are to draw the current piece
-                if (should) {
-                    // Map piece coordinates to texture coordinates
-                
-                    // Calculate supposed coordinates of the piece
-                    vec2 coord = vec2(float(px) * pieceW, float(py) * pieceH);
-                    // Add coordinates from within piece
-                    coord += sp;
-                    // Divide by image size
-                    coord /= u_imageSize;
-                    
-                    gl_FragColor = texture2D(u_image, coord);
-                }
-                
-
-            }
-        }
     </script>
 </body>
 </html>

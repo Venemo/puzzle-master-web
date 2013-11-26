@@ -8,10 +8,12 @@ PM.Piece = (function () {
         this.px = px;
         this.py = py;
         
-        this.x = image.width * px;
-        this.y = image.height * py;
+        this.supposedPosition = { x: image.width * px, y: image.height * py };
+        this.x = this.supposedPosition.x;
+        this.y = this.supposedPosition.y;
         this.transformOrigin = { x: image.width / 2, y: image.height / 2 };
         this.grabbedTouches = [];
+        
         
         var that = this;
         
@@ -72,6 +74,10 @@ PM.Piece = (function () {
         that.doDrag = function (sx, sy) {
             that.x = sx - that.dragStart.x;
             that.y = sy - that.dragStart.y;
+        };
+        
+        that.checkMergeability = function (other) {
+            // TODO
         };
     };
     

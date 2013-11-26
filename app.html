@@ -8,62 +8,65 @@
 </head>
 <body>
     
-    <canvas id="maincanvas">
-    </canvas>
+    <div id="game-ui">
+        <canvas id="maincanvas">
+        </canvas>
+        <button id="btn-restart">Restart</button>
+    </div>
     
     <div id="main-ui">
         
     </div>
     
+    <script src="js/renderloop.js"></script>
     <script src="js/piece.js"></script>
     <script src="js/game.js"></script>
     <script>
         var mainCanvas = document.getElementById("maincanvas");
         mainCanvas.width = document.documentElement.clientWidth;
         mainCanvas.height = document.documentElement.clientHeight;
+
+        var btnRestart = document.getElementById("btn-restart");
+        btnRestart.onclick = function() { startGame(); };
         
-        var image = new Image();
-        
-        image.src = "images/image4.jpg";
-        image.onload = function() {
-            var ctx = mainCanvas.getContext("2d");
-            var isDirty = true, stopLoop = true;
-            
-            var game = new PM.Game(image, 2, 3, function() {
-                isDirty = true;
-            });
-            
-            ctx.drawImage(image, 0, 0);
-            
-            var drawLoop = function() {
-                mozRequestAnimationFrame(function() {
-                    if (isDirty) {
-                        game.draw(ctx);
-                        isDirty = false;
-                    }
-                    //if (!stopLoop) {
-                    //    drawLoop();
-                    //}
-                    drawLoop();
+        var startGame = function () {
+            console.log("starting game");
+            var image = new Image();
+            image.src = "images/image4.jpg";
+            image.onload = function() {
+                var ctx = mainCanvas.getContext("2d");
+                var renderLoop = new PM.RenderLoop(function () { game.draw(ctx); });
+                var game = new PM.Game(image, 2, 3, function () { renderLoop.markDirty(); }, function () { renderLoop.addLoopRequest(); }, function () { renderLoop.removeLoopRequest(); });
+                
+                renderLoop.start();
+                
+                // Touch events
+                mainCanvas.addEventListener("touchstart", function (e) {
+                    renderLoop.addLoopRequest();
+                    game.reactToTouchStart(e.touches);
+                });
+                mainCanvas.addEventListener("touchend", function (e) {
+                    game.reactToTouchEnd(e.touches);
+                    renderLoop.removeLoopRequest();
+                });
+                mainCanvas.addEventListener("touchmove", function (e) {
+                    game.reactToTouchMove(e.touches);
+                });
+                
+                // Mouse events
+                mainCanvas.addEventListener("mousedown", function (e) {
+                    console.log(e);
+                    renderLoop.addLoopRequest();
+                    game.reactToTouchStart([{ clientX: e.clientX, clientY: e.clientY }]);
+                });
+                mainCanvas.addEventListener("mouseup", function (e) {
+                    game.reactToTouchEnd([{ clientX: e.clientX, clientY: e.clientY }]);
+                    renderLoop.removeLoopRequest();
+                });
+                mainCanvas.addEventListener("mousemove", function (e) {
+                    game.reactToTouchMove([{ clientX: e.clientX, clientY: e.clientY }]);
                 });
             };
-            drawLoop();
-            
-            
-            mainCanvas.addEventListener("touchstart", function (e) {
-                game.reactToTouchStart(e.touches);
-                isDirty = true;
-                //drawLoop();
-            });
-            mainCanvas.addEventListener("touchend", function (e) {
-                game.reactToTouchEnd(e.touches);
-                isDirty = true;
-                //stopLoop = true;
-            });
-            mainCanvas.addEventListener("touchmove", function (e) {
-                game.reactToTouchMove(e.touches);
-                isDirty = true;
-            });
         };
         
     </script>

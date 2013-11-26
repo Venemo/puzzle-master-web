@@ -41,12 +41,15 @@ PM.Game = (function () {
         return new PM.Piece(canvas, px, py);
     };
     
-    var Game = function Game (image, rows, cols, animateCallback) {
+    var Game = function Game (image, rows, cols, redraw, onAnimStarting, onAnimEnded) {
         var that = this;
         this.bigImage = image;
         this.rows = rows;
         this.cols = cols;
         this.pieces = createPieces(image, rows, cols);
+        this.redraw = redraw;
+        this.onAnimStarting = onAnimStarting;
+        this.onAnimEnded = onAnimEnded;
 
         var v = [];
         var maxt = 400;
@@ -60,6 +63,7 @@ PM.Game = (function () {
         }
         
         setTimeout(function() {
+            that.onAnimStarting();
             var t = 0;
             var step = 20;
             function anim () {
@@ -71,11 +75,14 @@ PM.Game = (function () {
                             that.pieces[i].y += v[i].vy * step;
                             //that.pieces[i].angle += v[i].om * step;
                         }
-                        animateCallback();
+                        that.redraw();
                         anim();
                         
                         t += step;
                     }, step);
+                }
+                else {
+                    that.onAnimEnded();
                 }
             };
             anim();
@@ -125,6 +132,7 @@ PM.Game = (function () {
                 }
             }
         }
+        this.redraw();
     };
     
     Game.prototype.reactToTouchEnd = function (touches) {
@@ -141,16 +149,22 @@ PM.Game = (function () {
 //                console.log("touch end done");
 //            }
 //        }
+        this.redraw();
     };
     
     Game.prototype.reactToTouchMove = function (touches) {
+        var shouldRedraw = false;
         for (var i = 0; i < touches.length; i++) {
             var grabbers = this.pieces.filter(function(p) {
                 return p.grabbedTouches.some(function(id) { return id === touches[i].identifier; });
             });
             if (grabbers.length) {
                 grabbers[0].doDrag(touches[i].clientX, touches[i].clientY);
+                shouldRedraw = true;
             }
+        }
+        if (shouldRedraw) {
+            this.redraw();
         }
     };
     

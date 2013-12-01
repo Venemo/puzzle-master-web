@@ -158,7 +158,7 @@ PM.Game = (function () {
 //            //ctx.lineTo(leftLine, topLine + h - ty);
 //            ctx.arc(leftLine, topLine + h / 2, m / 2, 3 * Math.PI / 2, Math.PI / 2);
 //        }
-//        ctx.lineTo(leftLine, topLine);
+        ctx.lineTo(l, t);
         
         //ctx.clip();
         ctx.stroke();

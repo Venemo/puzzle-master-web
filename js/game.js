@@ -19,8 +19,8 @@ PM.Game = (function () {
         for (var i = 0; i < cols; i++) {
             for (var j = 0; j < rows; j++) {
                 pieces.push(drawPiece(image, game, i, j, w, h, rows, cols));
-                break;
-            } break;
+                //break;
+            } //break;
         }
         
         return pieces;
@@ -68,35 +68,43 @@ PM.Game = (function () {
         
         var ctx = canvas.getContext("2d");
         
-        var l = (tabStatus & PM.TAB_LEFT_TAB) ? m : 0;
-        var t = (tabStatus & PM.TAB_TOP_TAB) ? m : 0;
-        
-        var r = m * 3 / 5;
-        var b = r * Math.sin(Math.acos((m - r) / r));
-        var magic = ((m - r) / Math.sqrt(m * (2 * r - m))) * (m) + b; // Spent a whole evening on this one
-        
-        // TODO: get rid of these
-        var tx = w * 2 / 5;
-        var ty = h * 2 / 5;
-        
         console.log(px, py,
                     (tabStatus & PM.TAB_TOP_TAB ?    "top tab" : (tabStatus & PM.TAB_TOP_BLANK ?       "top blank" :    "top straight")),
                     (tabStatus & PM.TAB_RIGHT_TAB ?  "right tab" : (tabStatus & PM.TAB_RIGHT_BLANK ?   "right blank" :  "right straight")),
                     (tabStatus & PM.TAB_BOTTOM_TAB ? "bottom tab" : (tabStatus & PM.TAB_BOTTOM_BLANK ? "bottom blank" : "bottom straight")),
                     (tabStatus & PM.TAB_LEFT_TAB ?   "left tab" : (tabStatus & PM.TAB_LEFT_BLANK ?     "left blank" :   "left straight")));
         
+        
+        var l = (tabStatus & PM.TAB_LEFT_TAB) ? m : 0;
+        var t = (tabStatus & PM.TAB_TOP_TAB) ? m : 0;
+        var r = m * 3 / 5;
+        var b = r * Math.sin(Math.acos((m - r) / r));
+        var magic = ((m - r) / Math.sqrt(m * (2 * r - m))) * (m) + b; // Spent a whole evening on this one
+        
         ctx.beginPath();
         ctx.moveTo(l, t);
             
-//        // top-left to top-right
-//        if (tabStatus & PM.TAB_TOP_TAB) {
-//            //ctx.lineTo(l + tx, t);
-//            ctx.arc(l + w / 2, t, m / 2, Math.PI, 0);
-//        }
-//        else if (tabStatus & PM.TAB_TOP_BLANK) {
-//            //ctx.lineTo(l + tx, t);
-//            ctx.arc(l + w / 2, t, m / 2, -Math.PI, 0);
-//        }
+        // top-left to top-right
+        if (tabStatus & PM.TAB_TOP_TAB) {
+            var y1 = t - m;
+            var x1 = l + w / 2 + magic;
+            var y2 = y1;
+            var x2 = t + h / 2;
+            
+            ctx.lineTo(l + w / 2 - b, t);
+            ctx.arcTo(l + w - x1, y1, x2, y2, r);
+            ctx.arcTo(x1, y1, l + w / 2 + b, t, r);
+        }
+        else if (tabStatus & PM.TAB_TOP_BLANK) {
+            var y1 = t + m;
+            var x1 = l + w / 2 + magic;
+            var y2 = y1;
+            var x2 = t + h / 2;
+            
+            ctx.lineTo(l + w / 2 - b, t);
+            ctx.arcTo(l + w - x1, y1, x2, y2, r);
+            ctx.arcTo(x1, y1, l + w / 2 + b, t, r);
+        }
         ctx.lineTo(l + w, t);
         
         // top-right to bottom-right
@@ -148,16 +156,28 @@ PM.Game = (function () {
             ctx.arcTo(l + w - x1, y1, l + w / 2 - b, t + h, r);
         }
         ctx.lineTo(l, t + h);
-//        
-//        // bottom-left to top-left
-//        if (tabStatus & PM.TAB_LEFT_TAB) {
-//            //ctx.lineTo(leftLine, topLine + h - ty);
-//            ctx.arc(leftLine, topLine + h / 2, m / 2, -Math.PI / 2, Math.PI / 2);
-//        }
-//        else if (tabStatus & PM.TAB_LEFT_BLANK) {
-//            //ctx.lineTo(leftLine, topLine + h - ty);
-//            ctx.arc(leftLine, topLine + h / 2, m / 2, 3 * Math.PI / 2, Math.PI / 2);
-//        }
+        
+        // bottom-left to top-left
+        if (tabStatus & PM.TAB_LEFT_TAB) {
+            var x1 = l - m;
+            var y1 = t + h / 2 + magic;
+            var x2 = x1;
+            var y2 = t + h / 2;
+            
+            ctx.lineTo(l, t + h / 2 + b);
+            ctx.arcTo(x1, y1, x2, y2, r);
+            ctx.arcTo(x1, t + h - y1, l, t + h / 2 - b, r);
+        }
+        else if (tabStatus & PM.TAB_LEFT_BLANK) {
+            var x1 = l + m;
+            var y1 = t + h / 2 + magic;
+            var x2 = x1;
+            var y2 = t + h / 2;
+            
+            ctx.lineTo(l, t + h / 2 + b);
+            ctx.arcTo(x1, y1, x2, y2, r);
+            ctx.arcTo(x1, t + h - y1, l, t + h / 2 - b, r);
+        }
         ctx.lineTo(l, t);
         
         //ctx.clip();

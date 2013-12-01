@@ -70,7 +70,10 @@ PM.Game = (function () {
         
         var l = (tabStatus & PM.TAB_LEFT_TAB) ? m : 0;
         var t = (tabStatus & PM.TAB_TOP_TAB) ? m : 0;
+        
         var r = m * 3 / 5;
+        var b = r * Math.sin(Math.acos((m - r) / r));
+        var magic = ((m - r) / Math.sqrt(m * (2 * r - m))) * (m) + b; // Spent a whole evening on this one
         
         // TODO: get rid of these
         var tx = w * 2 / 5;
@@ -98,42 +101,53 @@ PM.Game = (function () {
         
         // top-right to bottom-right
         if (tabStatus & PM.TAB_RIGHT_TAB) {
-            var b = r * Math.sin(Math.acos((m - r) / r));
             var x1 = l + w + m;
-            var y1 = t + h / 2 + ((m - r) / Math.sqrt(m * (2 * r - m))) * (m) + b;
+            var y1 = t + h / 2 + magic;
             var x2 = x1;
             var y2 = t + h / 2;
-            
             //console.log("m=" + String(m), "w=" + String(w), "h=" + String(h), "t=" + String(t), "l=" + String(l), "x1=" + String(x1), "y1=" + String(y1), "x2=" + String(x2), "y2=" + String(y2), "r=" + String(r));
             
-            // line from top-right to beginning of tab
             ctx.lineTo(l + w, t + h / 2 - b);
-            // top half of the tab
             ctx.arcTo(x1, t + h - y1, x2, y2, r);
-            // uncomment when debugging the arcs
-            //ctx.lineTo(x2, y2);
-            // bottom half of the tab
+            //ctx.lineTo(x2, y2); // uncomment when debugging the arcs
             ctx.arcTo(x1, y1, l + w, t + h / 2 + b, r);
-            // uncomment when debugging the arcs
-            //ctx.lineTo(l + w, t + h / 2 + b);
+            //ctx.lineTo(l + w, t + h / 2 + b); // uncomment when debugging the arcs
             
         }
         else if (tabStatus & PM.TAB_RIGHT_BLANK) {
-            //ctx.lineTo(l + w, t + ty);
-            //ctx.arc(l + w, t + h / 2, m / 2, Math.PI / 2, -Math.PI / 2, true);
+            var x1 = l + w - m;
+            var y1 = t + h / 2 + magic;
+            var x2 = x1;
+            var y2 = t + h / 2;
+            
+            ctx.lineTo(l + w, t + h / 2 - b);
+            ctx.arcTo(x1, t + h - y1, x2, y2, r);
+            ctx.arcTo(x1, y1, l + w, t + h / 2 + b, r);
         }
         ctx.lineTo(l + w, t + h);
-//        
-//        // bottom-right to bottom-left
-//        if (tabStatus & PM.TAB_BOTTOM_TAB) {
-//            //ctx.lineTo(leftLine + w - tx, topLine + h);
-//            ctx.arc(leftLine + w / 2, topLine + h, m / 2, 0, Math.PI);
-//        }
-//        else if (tabStatus & PM.TAB_BOTTOM_BLANK) {
-//            //ctx.lineTo(leftLine + w - tx, topLine + h);
-//            ctx.arc(leftLine + w / 2, topLine + h, m / 2, 0, -Math.PI);
-//        }
-//        ctx.lineTo(leftLine, topLine + h);
+        
+        // bottom-right to bottom-left
+        if (tabStatus & PM.TAB_BOTTOM_TAB) {
+            var y1 = t + h + m;
+            var x1 = l + w / 2 + magic;
+            var y2 = y1;
+            var x2 = t + h / 2;
+            
+            ctx.lineTo(l + w / 2 + b, t + h);
+            ctx.arcTo(x1, y1, x2, y2, r);
+            ctx.arcTo(l + w - x1, y1, l + w / 2 - b, t + h, r);
+        }
+        else if (tabStatus & PM.TAB_BOTTOM_BLANK) {
+            var y1 = t + h - m;
+            var x1 = l + w / 2 + magic;
+            var y2 = y1;
+            var x2 = t + h / 2;
+            
+            ctx.lineTo(l + w / 2 + b, t + h);
+            ctx.arcTo(x1, y1, x2, y2, r);
+            ctx.arcTo(l + w - x1, y1, l + w / 2 - b, t + h, r);
+        }
+        ctx.lineTo(l, t + h);
 //        
 //        // bottom-left to top-left
 //        if (tabStatus & PM.TAB_LEFT_TAB) {

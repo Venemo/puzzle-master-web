@@ -3,7 +3,7 @@ PM = typeof(PM) === "undefined" ? {} : PM;
 
 PM.Game = (function () {
 
-    var createPieces = function (image, rows, cols) {
+    var createPieces = function (image, game, rows, cols) {
         if (rows < 1 || cols < 1) {
             throw new Error("Invalid parameters");
         }
@@ -18,27 +18,140 @@ PM.Game = (function () {
         
         for (var i = 0; i < cols; i++) {
             for (var j = 0; j < rows; j++) {
-                pieces.push(drawPiece(image, i, j, w, h, rows, cols));
-                //break;
-            } //break;
+                pieces.push(drawPiece(image, game, i, j, w, h, rows, cols));
+                break;
+            } break;
         }
         
         return pieces;
     };
     
-    var drawPiece = function (image, px, py, w, h, rows, cols) {
+    var drawPiece = function (image, game, px, py, w, h, rows, cols) {
+        var tabStatus = game.tabs[px][py];
+        var m = Math.min(Math.round(w / 5), Math.round(h / 5));
         var canvas = document.createElement("canvas");
-        var m = Math.min(Math.round(w / 6), Math.round(h / 6));
+        
+        canvas.width = w;
+        canvas.height = h;
+        
+        var sx = image.width / cols * px;
+        var sy = image.height / rows * py;
+        var sw = image.width / cols;
+        var sh = image.height / rows;
+        
+        var sxm = (w / image.width) * m;
+        var sym = (h / image.height) * m;
+        
+        var xPosCorr = 0;
+        var yPosCorr = 0;
+        
+        if (tabStatus & PM.TAB_TOP_TAB) {
+            sy -= sym;
+            sh += sym;
+            canvas.height += m;
+            yPosCorr -= m;
+        }
+        if (tabStatus & PM.TAB_BOTTOM_TAB) {
+            sh += sym;
+            canvas.height += m;
+        }
+        if (tabStatus & PM.TAB_LEFT_TAB) {
+            sx -= sxm;
+            sw += sxm;
+            canvas.width += m;
+            xPosCorr -= m;
+        }
+        if (tabStatus & PM.TAB_RIGHT_TAB) {
+            sw += sxm;
+            canvas.width += m;
+        }
+        
         var ctx = canvas.getContext("2d");
-        canvas.width = w;// + 2 * m;
-        canvas.height = h;// + 2 * m;
-        //ctx.
         
-        console.log(image.width / cols * px, image.width / rows * py, image.width / cols, image.width / rows, 0, 0, w, h);
-        ctx.drawImage(image, image.width / cols * px, image.height / rows * py, image.width / cols, image.height / rows, 0, 0, w, h);
-        //ctx.drawImage(image, 0, 0, w, h);
+        var l = (tabStatus & PM.TAB_LEFT_TAB) ? m : 0;
+        var t = (tabStatus & PM.TAB_TOP_TAB) ? m : 0;
+        var r = m * 3 / 5;
         
-        return new PM.Piece(canvas, px, py);
+        // TODO: get rid of these
+        var tx = w * 2 / 5;
+        var ty = h * 2 / 5;
+        
+        console.log(px, py,
+                    (tabStatus & PM.TAB_TOP_TAB ?    "top tab" : (tabStatus & PM.TAB_TOP_BLANK ?       "top blank" :    "top straight")),
+                    (tabStatus & PM.TAB_RIGHT_TAB ?  "right tab" : (tabStatus & PM.TAB_RIGHT_BLANK ?   "right blank" :  "right straight")),
+                    (tabStatus & PM.TAB_BOTTOM_TAB ? "bottom tab" : (tabStatus & PM.TAB_BOTTOM_BLANK ? "bottom blank" : "bottom straight")),
+                    (tabStatus & PM.TAB_LEFT_TAB ?   "left tab" : (tabStatus & PM.TAB_LEFT_BLANK ?     "left blank" :   "left straight")));
+        
+        ctx.beginPath();
+        ctx.moveTo(l, t);
+            
+//        // top-left to top-right
+//        if (tabStatus & PM.TAB_TOP_TAB) {
+//            //ctx.lineTo(l + tx, t);
+//            ctx.arc(l + w / 2, t, m / 2, Math.PI, 0);
+//        }
+//        else if (tabStatus & PM.TAB_TOP_BLANK) {
+//            //ctx.lineTo(l + tx, t);
+//            ctx.arc(l + w / 2, t, m / 2, -Math.PI, 0);
+//        }
+        ctx.lineTo(l + w, t);
+        
+        // top-right to bottom-right
+        if (tabStatus & PM.TAB_RIGHT_TAB) {
+            var b = r * Math.sin(Math.acos((m - r) / r));
+            var x1 = l + w + m;
+            var y1 = t + h / 2 + ((m - r) / Math.sqrt(m * (2 * r - m))) * (m) + b;
+            var x2 = x1;
+            var y2 = t + h / 2;
+            
+            //console.log("m=" + String(m), "w=" + String(w), "h=" + String(h), "t=" + String(t), "l=" + String(l), "x1=" + String(x1), "y1=" + String(y1), "x2=" + String(x2), "y2=" + String(y2), "r=" + String(r));
+            
+            // line from top-right to beginning of tab
+            ctx.lineTo(l + w, t + h / 2 - b);
+            // top half of the tab
+            ctx.arcTo(x1, t + h - y1, x2, y2, r);
+            // uncomment when debugging the arcs
+            //ctx.lineTo(x2, y2);
+            // bottom half of the tab
+            ctx.arcTo(x1, y1, l + w, t + h / 2 + b, r);
+            // uncomment when debugging the arcs
+            //ctx.lineTo(l + w, t + h / 2 + b);
+            
+        }
+        else if (tabStatus & PM.TAB_RIGHT_BLANK) {
+            //ctx.lineTo(l + w, t + ty);
+            //ctx.arc(l + w, t + h / 2, m / 2, Math.PI / 2, -Math.PI / 2, true);
+        }
+        ctx.lineTo(l + w, t + h);
+//        
+//        // bottom-right to bottom-left
+//        if (tabStatus & PM.TAB_BOTTOM_TAB) {
+//            //ctx.lineTo(leftLine + w - tx, topLine + h);
+//            ctx.arc(leftLine + w / 2, topLine + h, m / 2, 0, Math.PI);
+//        }
+//        else if (tabStatus & PM.TAB_BOTTOM_BLANK) {
+//            //ctx.lineTo(leftLine + w - tx, topLine + h);
+//            ctx.arc(leftLine + w / 2, topLine + h, m / 2, 0, -Math.PI);
+//        }
+//        ctx.lineTo(leftLine, topLine + h);
+//        
+//        // bottom-left to top-left
+//        if (tabStatus & PM.TAB_LEFT_TAB) {
+//            //ctx.lineTo(leftLine, topLine + h - ty);
+//            ctx.arc(leftLine, topLine + h / 2, m / 2, -Math.PI / 2, Math.PI / 2);
+//        }
+//        else if (tabStatus & PM.TAB_LEFT_BLANK) {
+//            //ctx.lineTo(leftLine, topLine + h - ty);
+//            ctx.arc(leftLine, topLine + h / 2, m / 2, 3 * Math.PI / 2, Math.PI / 2);
+//        }
+//        ctx.lineTo(leftLine, topLine);
+        
+        //ctx.clip();
+        ctx.stroke();
+        
+        //ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+        
+        return new PM.Piece(canvas, px, py, { x: w * px + xPosCorr, y: h * py + yPosCorr });
     };
     
     var Game = function Game (image, rows, cols, redraw, onAnimStarting, onAnimEnded) {
@@ -46,10 +159,12 @@ PM.Game = (function () {
         this.bigImage = image;
         this.rows = rows;
         this.cols = cols;
-        this.pieces = createPieces(image, rows, cols);
         this.redraw = redraw;
         this.onAnimStarting = onAnimStarting;
         this.onAnimEnded = onAnimEnded;
+        
+        this.tabs = PM.randomizeTabs(rows, cols);
+        this.pieces = createPieces(image, this, rows, cols);
 
         var v = [];
         var maxt = 400;
@@ -62,31 +177,31 @@ PM.Game = (function () {
             v.push({ vx: vx, vy: vy, om: om });
         }
         
-        setTimeout(function() {
-            that.onAnimStarting();
-            var t = 0;
-            var step = 20;
-            function anim () {
-                console.log(t);
-                if (t < maxt) {
-                    setTimeout(function() {
-                        for (var i = 0; i < that.pieces.length; i++) {
-                            that.pieces[i].x += v[i].vx * step;
-                            that.pieces[i].y += v[i].vy * step;
-                            //that.pieces[i].angle += v[i].om * step;
-                        }
-                        that.redraw();
-                        anim();
-                        
-                        t += step;
-                    }, step);
-                }
-                else {
-                    that.onAnimEnded();
-                }
-            };
-            anim();
-        }, 800);
+//        setTimeout(function() {
+//            that.onAnimStarting();
+//            var t = 0;
+//            var step = 20;
+//            function anim () {
+//                console.log(t);
+//                if (t < maxt) {
+//                    setTimeout(function() {
+//                        for (var i = 0; i < that.pieces.length; i++) {
+//                            that.pieces[i].x += v[i].vx * step;
+//                            that.pieces[i].y += v[i].vy * step;
+//                            //that.pieces[i].angle += v[i].om * step;
+//                        }
+//                        that.redraw();
+//                        anim();
+//                        
+//                        t += step;
+//                    }, step);
+//                }
+//                else {
+//                    that.onAnimEnded();
+//                }
+//            };
+//            anim();
+//        }, 800);
     };
     
     Game.prototype.findPiece = function (x, y) {

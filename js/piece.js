@@ -3,17 +3,16 @@ PM = typeof(PM) === "undefined" ? {} : PM;
 
 PM.Piece = (function () {
 
-    var Piece = function Piece (image, px, py) {
+    var Piece = function Piece (image, px, py, supposedPosition) {
         this.image = image;
         this.px = px;
         this.py = py;
         
-        this.supposedPosition = { x: image.width * px, y: image.height * py };
+        this.supposedPosition = supposedPosition;
         this.x = this.supposedPosition.x;
         this.y = this.supposedPosition.y;
         this.transformOrigin = { x: image.width / 2, y: image.height / 2 };
         this.grabbedTouches = [];
-        
         
         var that = this;
         

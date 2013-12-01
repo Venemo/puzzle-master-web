@@ -92,7 +92,7 @@ PM.Game = (function () {
             var x2 = t + h / 2;
             
             ctx.lineTo(l + w / 2 - b, t);
-            ctx.arcTo(l + w - x1, y1, x2, y2, r);
+            ctx.arcTo(2 * l + w - x1, y1, x2, y2, r);
             ctx.arcTo(x1, y1, l + w / 2 + b, t, r);
         }
         else if (tabStatus & PM.TAB_TOP_BLANK) {
@@ -102,7 +102,7 @@ PM.Game = (function () {
             var x2 = t + h / 2;
             
             ctx.lineTo(l + w / 2 - b, t);
-            ctx.arcTo(l + w - x1, y1, x2, y2, r);
+            ctx.arcTo(2 * l + w - x1, y1, x2, y2, r);
             ctx.arcTo(x1, y1, l + w / 2 + b, t, r);
         }
         ctx.lineTo(l + w, t);
@@ -116,7 +116,7 @@ PM.Game = (function () {
             //console.log("m=" + String(m), "w=" + String(w), "h=" + String(h), "t=" + String(t), "l=" + String(l), "x1=" + String(x1), "y1=" + String(y1), "x2=" + String(x2), "y2=" + String(y2), "r=" + String(r));
             
             ctx.lineTo(l + w, t + h / 2 - b);
-            ctx.arcTo(x1, t + h - y1, x2, y2, r);
+            ctx.arcTo(x1, 2 * t + h - y1, x2, y2, r);
             //ctx.lineTo(x2, y2); // uncomment when debugging the arcs
             ctx.arcTo(x1, y1, l + w, t + h / 2 + b, r);
             //ctx.lineTo(l + w, t + h / 2 + b); // uncomment when debugging the arcs
@@ -129,7 +129,7 @@ PM.Game = (function () {
             var y2 = t + h / 2;
             
             ctx.lineTo(l + w, t + h / 2 - b);
-            ctx.arcTo(x1, t + h - y1, x2, y2, r);
+            ctx.arcTo(x1, 2 * t + h - y1, x2, y2, r);
             ctx.arcTo(x1, y1, l + w, t + h / 2 + b, r);
         }
         ctx.lineTo(l + w, t + h);
@@ -143,7 +143,7 @@ PM.Game = (function () {
             
             ctx.lineTo(l + w / 2 + b, t + h);
             ctx.arcTo(x1, y1, x2, y2, r);
-            ctx.arcTo(l + w - x1, y1, l + w / 2 - b, t + h, r);
+            ctx.arcTo(2 * l + w - x1, y1, l + w / 2 - b, t + h, r);
         }
         else if (tabStatus & PM.TAB_BOTTOM_BLANK) {
             var y1 = t + h - m;
@@ -153,7 +153,7 @@ PM.Game = (function () {
             
             ctx.lineTo(l + w / 2 + b, t + h);
             ctx.arcTo(x1, y1, x2, y2, r);
-            ctx.arcTo(l + w - x1, y1, l + w / 2 - b, t + h, r);
+            ctx.arcTo(2 * l + w - x1, y1, l + w / 2 - b, t + h, r);
         }
         ctx.lineTo(l, t + h);
         
@@ -166,7 +166,7 @@ PM.Game = (function () {
             
             ctx.lineTo(l, t + h / 2 + b);
             ctx.arcTo(x1, y1, x2, y2, r);
-            ctx.arcTo(x1, t + h - y1, l, t + h / 2 - b, r);
+            ctx.arcTo(x1, 2 * t + h - y1, l, t + h / 2 - b, r);
         }
         else if (tabStatus & PM.TAB_LEFT_BLANK) {
             var x1 = l + m;
@@ -176,7 +176,7 @@ PM.Game = (function () {
             
             ctx.lineTo(l, t + h / 2 + b);
             ctx.arcTo(x1, y1, x2, y2, r);
-            ctx.arcTo(x1, t + h - y1, l, t + h / 2 - b, r);
+            ctx.arcTo(x1, 2 * t + h - y1, l, t + h / 2 - b, r);
         }
         ctx.lineTo(l, t);
         

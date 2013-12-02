@@ -8,12 +8,12 @@ PM.Game = (function () {
             throw new Error("Invalid parameters");
         }
         
-        var ww = Math.round(document.documentElement.clientWidth);
-        var hh = Math.round(document.documentElement.clientWidth / image.width * image.height);
+        var ww = Math.floor(document.documentElement.clientWidth);
+        var hh = Math.floor(document.documentElement.clientWidth / image.width * image.height);
     
-        var w = Math.round(ww / cols);
-        var h = Math.round(hh / rows);
-        console.log(ww, hh, w, h);
+        var w = Math.floor(ww / cols);
+        var h = Math.floor(hh / rows);
+        console.log(image.width, image.height, ww, hh, w, h);
         var pieces = [];
         
         for (var i = 0; i < cols; i++) {
@@ -28,41 +28,40 @@ PM.Game = (function () {
     
     var drawPiece = function (image, game, px, py, w, h, rows, cols) {
         var tabStatus = game.tabs[px][py];
-        var m = Math.min(Math.round(w / 5), Math.round(h / 5));
         var canvas = document.createElement("canvas");
         
         canvas.width = w;
         canvas.height = h;
         
-        var sx = image.width / cols * px;
-        var sy = image.height / rows * py;
-        var sw = image.width / cols;
-        var sh = image.height / rows;
+        var sx = Math.floor(image.width / cols * px);
+        var sy = Math.floor(image.height / rows * py);
+        var sw = Math.floor(image.width / cols);
+        var sh = Math.floor(image.height / rows);
         
-        var sxm = (w / image.width) * m;
-        var sym = (h / image.height) * m;
+        var m = Math.min(Math.round(w / 5), Math.round(h / 5));
+        var sm = Math.min(Math.round(image.width / cols / 5), Math.round(image.height / rows / 5));
         
         var xPosCorr = 0;
         var yPosCorr = 0;
         
         if (tabStatus & PM.TAB_TOP_TAB) {
-            sy -= sym;
-            sh += sym;
+            sy -= sm;
+            sh += sm;
             canvas.height += m;
             yPosCorr -= m;
         }
         if (tabStatus & PM.TAB_BOTTOM_TAB) {
-            sh += sym;
+            sh += sm;
             canvas.height += m;
         }
         if (tabStatus & PM.TAB_LEFT_TAB) {
-            sx -= sxm;
-            sw += sxm;
+            sx -= sm;
+            sw += sm;
             canvas.width += m;
             xPosCorr -= m;
         }
         if (tabStatus & PM.TAB_RIGHT_TAB) {
-            sw += sxm;
+            sw += sm;
             canvas.width += m;
         }
         
@@ -180,10 +179,8 @@ PM.Game = (function () {
         }
         ctx.lineTo(l, t);
         
-        //ctx.clip();
-        ctx.stroke();
-        
-        //ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+        ctx.clip();
+        ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
         
         return new PM.Piece(canvas, px, py, { x: w * px + xPosCorr, y: h * py + yPosCorr });
     };

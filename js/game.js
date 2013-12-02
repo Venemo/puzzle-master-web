@@ -237,7 +237,7 @@ PM.Game = (function () {
     
     Game.prototype.findPiece = function (x, y) {
         //console.log(JSON.stringify(this.pieces));
-        for (var i = 0; i < this.pieces.length; i++) {
+        for (var i = this.pieces.length; i --; ) {
             var piece = this.pieces[i];
             //console.log(JSON.stringify(piece));
             if (piece.containsPoint(x, y)) {

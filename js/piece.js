@@ -28,9 +28,11 @@ PM.Piece = (function () {
         };
         
         that.draw = function (ctx) {
+            ctx.save();
+            ctx.translate(that.x, that.y);
             ctx.rotate(that.angle);
-            ctx.drawImage(that.image, that.x, that.y);
-            ctx.rotate(0);
+            ctx.drawImage(that.image, 0, 0);
+            ctx.restore();
         };
         
         that.mapToScene = function(p0) {
@@ -82,7 +84,7 @@ PM.Piece = (function () {
     
     Piece.prototype.x = 0;
     Piece.prototype.y = 0;
-    Piece.prototype.angle = 0;
+    Piece.prototype.angle = Math.PI / 6;
     Piece.prototype.dragStart = null;
     Piece.prototype.transformOrigin = null;
     Piece.prototype.grabbedTouches = null;

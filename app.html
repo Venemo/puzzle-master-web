@@ -67,6 +67,10 @@
                 mainCanvas.addEventListener("mousemove", function (e) {
                     game.reactToTouchMove([{ clientX: e.clientX, clientY: e.clientY }]);
                 });
+                mainCanvas.addEventListener("contextmenu", function (e) {
+                    // Disallow context menu (right click means rotate)
+                    e.preventDefault();
+                });
             };
         };
         

@@ -185,15 +185,12 @@ PM.Game = (function () {
         return new PM.Piece(canvas, px, py, { x: w * px + xPosCorr, y: h * py + yPosCorr });
     };
     
-    var Game = function Game (image, rows, cols, redraw, onAnimStarting, onAnimEnded) {
+    var Game = function Game (image, rows, cols, renderLoop) {
         var that = this;
         this.bigImage = image;
         this.rows = rows;
         this.cols = cols;
-        this.redraw = redraw;
-        this.onAnimStarting = onAnimStarting;
-        this.onAnimEnded = onAnimEnded;
-        
+        this.renderLoop = renderLoop;
         this.tabs = PM.randomizeTabs(rows, cols);
         this.pieces = createPieces(image, this, rows, cols);
 
@@ -208,31 +205,31 @@ PM.Game = (function () {
             v.push({ vx: vx, vy: vy, om: om });
         }
         
-//        setTimeout(function() {
-//            that.onAnimStarting();
-//            var t = 0;
-//            var step = 20;
-//            function anim () {
-//                console.log(t);
-//                if (t < maxt) {
-//                    setTimeout(function() {
-//                        for (var i = 0; i < that.pieces.length; i++) {
-//                            that.pieces[i].x += v[i].vx * step;
-//                            that.pieces[i].y += v[i].vy * step;
-//                            //that.pieces[i].angle += v[i].om * step;
-//                        }
-//                        that.redraw();
-//                        anim();
-//                        
-//                        t += step;
-//                    }, step);
-//                }
-//                else {
-//                    that.onAnimEnded();
-//                }
-//            };
-//            anim();
-//        }, 800);
+        setTimeout(function() {
+            that.renderLoop.addLoopRequest();
+            var t = 0;
+            var step = 20;
+            function anim () {
+                console.log(t);
+                if (t < maxt) {
+                    setTimeout(function() {
+                        for (var i = 0; i < that.pieces.length; i++) {
+                            that.pieces[i].x += v[i].vx * step;
+                            that.pieces[i].y += v[i].vy * step;
+                            //that.pieces[i].angle += v[i].om * step;
+                        }
+                        that.renderLoop.markDirty();
+                        anim();
+                        
+                        t += step;
+                    }, step);
+                }
+                else {
+                    that.renderLoop.removeLoopRequest();
+                }
+            };
+            anim();
+        }, 800);
     };
     
     Game.prototype.findPiece = function (x, y) {
@@ -278,7 +275,7 @@ PM.Game = (function () {
                 }
             }
         }
-        this.redraw();
+        this.renderLoop.markDirty();
     };
     
     Game.prototype.reactToTouchEnd = function (touches) {
@@ -295,7 +292,7 @@ PM.Game = (function () {
 //                console.log("touch end done");
 //            }
 //        }
-        this.redraw();
+        this.renderLoop.markDirty();
     };
     
     Game.prototype.reactToTouchMove = function (touches) {
@@ -310,7 +307,7 @@ PM.Game = (function () {
             }
         }
         if (shouldRedraw) {
-            this.redraw();
+            this.renderLoop.markDirty();
         }
     };
     

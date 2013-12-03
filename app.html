@@ -37,7 +37,7 @@
             image.onload = function() {
                 var ctx = mainCanvas.getContext("2d");
                 var renderLoop = new PM.RenderLoop(function () { game.draw(ctx); });
-                var game = new PM.Game(image, 2, 3, function () { renderLoop.markDirty(); }, function () { renderLoop.addLoopRequest(); }, function () { renderLoop.removeLoopRequest(); });
+                var game = new PM.Game(image, 2, 3, renderLoop);
                 
                 renderLoop.start();
                 

@@ -154,9 +154,10 @@ PM.RenderLoop = (function () {
     NumberAnimation.prototype.renderLoop = null;
     NumberAnimation.prototype.duration = 0;
     NumberAnimation.prototype.prevTime = 0;
+    NumberAnimation.prototype.elapsed = 0;
     
     NumberAnimation.prototype.tick = function (t) {
-        console.log("animation tick called");
+        //console.log("animation tick called");
         this.renderLoop.markDirty();
         
         if (!this.prevTime) {
@@ -170,9 +171,10 @@ PM.RenderLoop = (function () {
         var dt = t - this.prevTime;
         this.prevTime = t;
         this.obj[this.prop] += this.speed * dt;
+        this.elapsed += dt;
         
-        if (this.obj[this.prop] >= this.to) {
-            console.log("animation tick: stopping animation");
+        if (this.elapsed >= this.duration) {
+            //console.log("animation tick: stopping animation");
             this.obj[this.prop] = this.to;
             this.renderLoop.removeCallback(this.renderLoopCallback);
             this.renderLoop.removeLoopRequest();

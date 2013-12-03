@@ -17,14 +17,20 @@ PM.Piece = (function () {
         var that = this;
         
         that.containsPoint = function (sx, sy) {
-            //console.log(JSON.stringify(that), sx, sy);
-            //return false;
-            
-            return sx >= that.x && sx <= that.x + that.image.width && sy >= that.y && sy <= that.y + that.image.height;
-            
+            // Transform coordinates to the coordinate system of the piece
             var p = that.mapFromScene({ x: sx, y: sy });
-            console.log(that.px, that.py, JSON.stringify(p));
-            return p.x >= 0 && p.x <= that.image.width && p.y >= 0 && p.y <= that.image.height;
+            
+            // Rule out cases when the user clicked outsite the image
+            if (p.x < 0 || p.x > that.image.width || p.y < 0 || p.y > that.image.height) {
+                return false;
+            }
+            
+            // Check canvas image data
+            var ctx = that.image.getContext('2d');
+            var imageData = ctx.getImageData(p.x, p.y, 1, 1);
+            return imageData.data[3] > 0;
+            
+            // TODO: skip checking image data for obvious places (like, the rectangle which surely doesn't belong to neither tabs nor blanks
         };
         
         that.draw = function (ctx) {
@@ -84,7 +90,7 @@ PM.Piece = (function () {
     
     Piece.prototype.x = 0;
     Piece.prototype.y = 0;
-    Piece.prototype.angle = Math.PI / 6;
+    Piece.prototype.angle = 0;// = Math.PI / 6;
     Piece.prototype.dragStart = null;
     Piece.prototype.transformOrigin = null;
     Piece.prototype.grabbedTouches = null;

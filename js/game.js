@@ -8,13 +8,13 @@ PM.Game = (function () {
             throw new Error("Invalid parameters");
         }
         
+        var pieces = [];
         var ww = Math.floor(document.documentElement.clientWidth);
         var hh = Math.floor(document.documentElement.clientWidth / image.width * image.height);
-    
         var w = Math.floor(ww / cols);
         var h = Math.floor(hh / rows);
+        
         console.log(image.width, image.height, ww, hh, w, h);
-        var pieces = [];
         
         for (var i = 0; i < cols; i++) {
             for (var j = 0; j < rows; j++) {

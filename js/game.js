@@ -194,42 +194,18 @@ PM.Game = (function () {
         this.tabs = PM.randomizeTabs(rows, cols);
         this.pieces = createPieces(image, this, rows, cols);
 
-        var v = [];
-        var maxt = 400;
         for (var i = 0; i < this.pieces.length; i++) {
             var endx = Math.round(Math.random() * (document.documentElement.clientWidth - 100) + 50);
             var endy = Math.round(Math.random() * (document.documentElement.clientHeight - 100) + 50);
-            var vx = (endx - this.pieces[i].x) / maxt;
-            var vy = (endy - this.pieces[i].y) / maxt;
-            var om = Math.round(Math.random() * Math.PI * 2) / maxt;
-            v.push({ vx: vx, vy: vy, om: om });
+            
+            var animX = this.renderLoop.createNumberAnimation(400, this.pieces[i], "x", endx);
+            var animY = this.renderLoop.createNumberAnimation(400, this.pieces[i], "y", endy);
+            animX.start();
+            animY.start();
+            //console.log(anim, this.pieces[i], endx);
+            //break;
         }
-        
-        setTimeout(function() {
-            that.renderLoop.addLoopRequest();
-            var t = 0;
-            var step = 20;
-            function anim () {
-                console.log(t);
-                if (t < maxt) {
-                    setTimeout(function() {
-                        for (var i = 0; i < that.pieces.length; i++) {
-                            that.pieces[i].x += v[i].vx * step;
-                            that.pieces[i].y += v[i].vy * step;
-                            //that.pieces[i].angle += v[i].om * step;
-                        }
-                        that.renderLoop.markDirty();
-                        anim();
-                        
-                        t += step;
-                    }, step);
-                }
-                else {
-                    that.renderLoop.removeLoopRequest();
-                }
-            };
-            anim();
-        }, 800);
+        renderLoop.markDirty();
     };
     
     Game.prototype.findPiece = function (x, y) {

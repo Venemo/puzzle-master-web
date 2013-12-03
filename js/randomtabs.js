@@ -1,4 +1,13 @@
 
+// This file is part of Puzzle Master (web edition)
+// https://github.com/Venemo/puzzle-master-web
+//
+// Licensed to you under the terms of the LGPL
+// See http://www.gnu.org/licenses/lgpl-3.0.txt
+//
+//
+// Copyright 2013, Timur Kristóf
+
 PM = typeof(PM) === "undefined" ? {} : PM;
 
 PM.TAB_BOTTOM_TAB =       1;

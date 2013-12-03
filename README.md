@@ -33,18 +33,19 @@ Developer info
 This version is built following a very similar structure as the Qt and the XNA editions, but of course
 has a HTML flavour.
 
-Every component is located in the `PM` namespace
+Every component is located in the `PM` namespace:
 
 * **PM.RenderLoop** - an efficient rendering implementation based on `requestAnimationFrame`
 * **PM.Game** - manages game logics and interaction
 * **PM.Piece** - represents a single piece of the puzzle, implementing coordinate transforms and similar yummy things
+* **PM.creation** - singleton for generating puzzle pieces
 
 Everything is wired together in `app.js` which initializes the UI and starts the game.
 
 #### PM.RenderLoop
 
 This is the rendering loop that is responsible for drawing the game and driving animations.
-It's highly efficient because
+It's highly efficient because:
 
 * It doesn't repaint when the scene hasn't changed
 * It can be fully stopped so the loop doesn't have to run when nothing's happening

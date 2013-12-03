@@ -193,19 +193,24 @@ PM.Game = (function () {
         this.renderLoop = renderLoop;
         this.tabs = PM.randomizeTabs(rows, cols);
         this.pieces = createPieces(image, this, rows, cols);
-
+        
+        setTimeout(function() { that.shuffle(600); }, 500);
+        setTimeout(function() { that.shuffle(600); that.isReady = true; }, 1200);
+    };
+    
+    Game.prototype.isReady = false;
+    
+    Game.prototype.shuffle = function (duration) {
         for (var i = 0; i < this.pieces.length; i++) {
             var endx = Math.round(Math.random() * (document.documentElement.clientWidth - 100) + 50);
             var endy = Math.round(Math.random() * (document.documentElement.clientHeight - 100) + 50);
             
-            var animX = this.renderLoop.createNumberAnimation(400, this.pieces[i], "x", endx);
-            var animY = this.renderLoop.createNumberAnimation(400, this.pieces[i], "y", endy);
+            var animX = this.renderLoop.createNumberAnimation(duration, this.pieces[i], "x", endx);
+            var animY = this.renderLoop.createNumberAnimation(duration, this.pieces[i], "y", endy);
             animX.start();
             animY.start();
-            //console.log(anim, this.pieces[i], endx);
-            //break;
         }
-        renderLoop.markDirty();
+        this.renderLoop.markDirty();
     };
     
     Game.prototype.findPiece = function (x, y) {
@@ -229,6 +234,10 @@ PM.Game = (function () {
     };
     
     Game.prototype.reactToTouchStart = function (touches) {
+        if (!this.isReady) {
+            return;
+        }
+    
         for (var i = 0; i < touches.length; i++) {
             var grabbers = this.pieces.filter(function(p) { return p.grabbedTouches.some(function(id) { id === touches[i].identifier }); });
             //console.log("touch start");
@@ -255,6 +264,10 @@ PM.Game = (function () {
     };
     
     Game.prototype.reactToTouchEnd = function (touches) {
+        if (!this.isReady) {
+            return;
+        }
+        
         for (var i = 0; i < this.pieces.length; i++) {
             this.pieces[i].grabbedTouches = [];
         }
@@ -272,6 +285,10 @@ PM.Game = (function () {
     };
     
     Game.prototype.reactToTouchMove = function (touches) {
+        if (!this.isReady) {
+            return;
+        }
+        
         var shouldRedraw = false;
         for (var i = 0; i < touches.length; i++) {
             var grabbers = this.pieces.filter(function(p) {

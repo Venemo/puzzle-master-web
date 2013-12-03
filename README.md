@@ -41,3 +41,23 @@ Every component is located in the `PM` namespace
 
 Everything is wired together in `app.js` which initializes the UI and starts the game.
 
+#### PM.RenderLoop
+
+This is the rendering loop that is responsible for drawing the game and driving animations.
+It's highly efficient because
+
+* It doesn't repaint when the scene hasn't changed
+* It can be fully stopped so the loop doesn't have to run when nothing's happening
+* It can drive animations using the timestamp it receives from `requestAnimationFrame` so you should **never** use `setTimeout` for it
+
+#### PM.Piece
+
+A piece manages an individual puzzle piece. Its responsibilities are the following:
+
+* Coordinate transformations from a piece to the scene and back
+* Drawing the piece
+* Deciding if a given point belongs to the piece (used to determine which piece the user clicked on)
+
+
+
+

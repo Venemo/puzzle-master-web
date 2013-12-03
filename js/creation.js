@@ -149,11 +149,21 @@ PM.creation = (function (PM) {
                     (tabStatus & PM.TAB_LEFT_TAB ?   "left tab" : (tabStatus & PM.TAB_LEFT_BLANK ?     "left blank" :   "left straight")));
         
         
+        // x coordinate of the top-left point of the piece (excluding tabs/blanks)
         var l = (tabStatus & PM.TAB_LEFT_TAB) ? m : 0;
+        // y coordinate of the top-left point of the piece (excluding tabs/blanks)
         var t = (tabStatus & PM.TAB_TOP_TAB) ? m : 0;
+        // radius of tabs/blanks
         var r = m * 3 / 5;
+        // half the length of the intersecting line between a tab/blank and the rectangle of the piece
         var b = r * Math.sin(Math.acos((m - r) / r));
-        var magic = ((m - r) / Math.sqrt(m * (2 * r - m))) * (m) + b; // Spent a whole evening on this one
+        // helper for the y coordinate of the points used by ctx.arcTo() for drawing tabs and blanks
+        // NOTE: At some point I actually spent a whole evening on this one, and calculating this formula
+        //       involved coordinate geometry and differential calculus. There are three pages of calculations
+        //       in a notebook for this. (With drawings too, yay!)
+        //       Basically, it's the y coordinate of the control point used by arcTo() expressed in a
+        //       coordinate system whose origo is the center of a tab.
+        var magic = ((m - r) / Math.sqrt(m * (2 * r - m))) * (m) + b; 
         
         ctx.beginPath();
         ctx.moveTo(l, t);

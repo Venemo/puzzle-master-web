@@ -12,17 +12,34 @@ PM = typeof(PM) === "undefined" ? {} : PM;
 
 PM.Piece = (function () {
 
-    var Piece = function Piece (image, px, py, supposedPosition) {
+    var PiecePrimitive = function PiecePrimitive (stroke, image, x, y) {
+        this.stroke = stroke;
         this.image = image;
+        
+        if (x) {
+            this.x = x;
+        }
+        if (y) {
+            this.y = y;
+        }
+    };
+    
+    PiecePrimitive.prototype.strokeSize = 2;
+    PiecePrimitive.prototype.x = 0;
+    PiecePrimitive.prototype.y = 0;
+
+    var Piece = function Piece (primitive, px, py, supposedPosition) {
         this.px = px;
         this.py = py;
-        
         this.supposedPosition = supposedPosition;
         this.x = this.supposedPosition.x;
         this.y = this.supposedPosition.y;
-        this.transformOrigin = { x: image.width / 2, y: image.height / 2 };
+        this.transformOrigin = { x: primitive.stroke.width / 2, y: primitive.stroke.height / 2 };
         this.grabbedTouches = [];
+        this.primitives = [primitive];
     };
+    
+    Piece.PiecePrimitive = PiecePrimitive;
     
     Piece.prototype.x = 0;
     Piece.prototype.y = 0;
@@ -33,9 +50,19 @@ PM.Piece = (function () {
         
     Piece.prototype.draw = function (ctx) {
         ctx.save();
+        
         ctx.translate(this.x, this.y);
         ctx.rotate(this.angle);
-        ctx.drawImage(this.image, 0, 0);
+        
+        // Draw strokes
+        for (var i = this.primitives.length; i--; ) {
+            ctx.drawImage(this.primitives[i].stroke, this.primitives[i].x, this.primitives[i].y);
+        }
+        // Draw images
+        for (var i = this.primitives.length; i--; ) {
+            ctx.drawImage(this.primitives[i].image, this.primitives[i].x, this.primitives[i].y);
+        }
+        
         ctx.restore();
     };
         
@@ -54,17 +81,22 @@ PM.Piece = (function () {
     
     Piece.prototype.containsPoint = function (sx, sy) {
         // Transform coordinates to the coordinate system of the piece
-        var p = this.mapFromScene({ x: sx, y: sy });
+        var pt = this.mapFromScene({ x: sx, y: sy });
         
-        // Rule out cases when the user clicked outsite the image
-        if (p.x < 0 || p.x > this.image.width || p.y < 0 || p.y > this.image.height) {
-            return false;
+        for (var i = this.primitives.length; i--; ) {
+            var primitive = this.primitives[i];
+            var p = { x: pt.x - primitive.x, y: pt.y - primitive.y };
+            
+            // Rule out cases when the user clicked outsite the image
+            if (p.x < 0 || p.x > primitive.stroke.width || p.y < 0 || p.y > primitive.stroke.height) {
+                continue;
+            }
+            
+            // Check canvas image data
+            var ctx = primitive.stroke.getContext('2d');
+            var imageData = ctx.getImageData(p.x, p.y, 1, 1);
+            return imageData.data[3] > 0;
         }
-        
-        // Check canvas image data
-        var ctx = this.image.getContext('2d');
-        var imageData = ctx.getImageData(p.x, p.y, 1, 1);
-        return imageData.data[3] > 0;
         
         // TODO: skip checking image data for obvious places (like, the rectangle which surely doesn't belong to neither tabs nor blanks
     };

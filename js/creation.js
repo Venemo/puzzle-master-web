@@ -102,13 +102,17 @@ PM.creation = (function (PM) {
     };
     
     var createPiecePathOnCanvas = function (canvas, tabStatus, w, h) {
+        // Set basic canvas size
         canvas.width = w;
         canvas.height = h;
         
+        // Margin (are occupied by tabs)
         var m = Math.min(Math.round(w / 5), Math.round(h / 5));
+        // Positioning corrections
         var xPosCorr = 0;
         var yPosCorr = 0;
         
+        // Adjust size and positioning for tab status
         if (tabStatus & PM.TAB_TOP_TAB) {
             canvas.height += m;
             yPosCorr -= m;
@@ -124,10 +128,17 @@ PM.creation = (function (PM) {
             canvas.width += m;
         }
         
+        // Additional margin (area used for stroke, shadow, etc.)
+        var am = 10;
+        canvas.width += 2 * am;
+        canvas.height += 2 * am;
+        xPosCorr -= am;
+        yPosCorr -= am;
+        
         // x coordinate of the top-left point of the piece (excluding tabs/blanks)
-        var l = (tabStatus & PM.TAB_LEFT_TAB) ? m : 0;
+        var l = am + ((tabStatus & PM.TAB_LEFT_TAB) ? m : 0);
         // y coordinate of the top-left point of the piece (excluding tabs/blanks)
-        var t = (tabStatus & PM.TAB_TOP_TAB) ? m : 0;
+        var t = am + ((tabStatus & PM.TAB_TOP_TAB) ? m : 0);
         // radius of tabs/blanks
         var r = m * 3 / 5;
         // half the length of the intersecting line between a tab/blank and the rectangle of the piece
@@ -246,6 +257,19 @@ PM.creation = (function (PM) {
         };
     };
     
+    var createStroke = function (tabStatus, w, h) {
+        var canvas = document.createElement("canvas");
+        var posCorr = createPiecePathOnCanvas(canvas, tabStatus, w, h);
+        var ctx = canvas.getContext('2d');
+        
+        ctx.fillStyle = ctx.strokeStyle = "#fdfdfd";
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        ctx.fill();
+        
+        return canvas;
+    };
+    
     var drawPiece = function (image, game, tabStatus, px, py, w, h, rows, cols) {
         var canvas = document.createElement("canvas");
         
@@ -283,7 +307,10 @@ PM.creation = (function (PM) {
         ctx.clip();
         ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
         
-        return new PM.Piece(canvas, px, py, { x: w * px + posCorr.x, y: h * py + posCorr.y });
+        var stroke = createStroke(tabStatus, w, h);
+        var primitive = new PM.Piece.PiecePrimitive(stroke, canvas);
+        
+        return new PM.Piece(primitive, px, py, { x: w * px + posCorr.x, y: h * py + posCorr.y });
     };
     
     return {

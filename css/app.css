@@ -14,6 +14,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 #loading-ui {
     position: absolute;
@@ -21,7 +22,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    font-size: 120%
+    font-size: 120%;
     text-align: center;
 }
 #btn-restart {

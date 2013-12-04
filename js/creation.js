@@ -93,7 +93,7 @@ PM.creation = (function (PM) {
         
         for (var i = 0; i < cols; i++) {
             for (var j = 0; j < rows; j++) {
-                pieces.push(drawPiece(image, game, tabs, i, j, w, h, rows, cols));
+                pieces.push(drawPiece(image, game, tabs[i][j], i, j, w, h, rows, cols));
                 //break;
             } //break;
         }
@@ -101,53 +101,28 @@ PM.creation = (function (PM) {
         return pieces;
     };
     
-    var drawPiece = function (image, game, tabs, px, py, w, h, rows, cols) {
-        var tabStatus = tabs[px][py];
-        var canvas = document.createElement("canvas");
-        
+    var createPiecePathOnCanvas = function (canvas, tabStatus, w, h) {
         canvas.width = w;
         canvas.height = h;
         
-        var sx = Math.floor(image.width / cols * px);
-        var sy = Math.floor(image.height / rows * py);
-        var sw = Math.floor(image.width / cols);
-        var sh = Math.floor(image.height / rows);
-        
         var m = Math.min(Math.round(w / 5), Math.round(h / 5));
-        var sm = Math.min(Math.round(image.width / cols / 5), Math.round(image.height / rows / 5));
-        
         var xPosCorr = 0;
         var yPosCorr = 0;
         
         if (tabStatus & PM.TAB_TOP_TAB) {
-            sy -= sm;
-            sh += sm;
             canvas.height += m;
             yPosCorr -= m;
         }
         if (tabStatus & PM.TAB_BOTTOM_TAB) {
-            sh += sm;
             canvas.height += m;
         }
         if (tabStatus & PM.TAB_LEFT_TAB) {
-            sx -= sm;
-            sw += sm;
             canvas.width += m;
             xPosCorr -= m;
         }
         if (tabStatus & PM.TAB_RIGHT_TAB) {
-            sw += sm;
             canvas.width += m;
         }
-        
-        var ctx = canvas.getContext("2d");
-        
-        console.log(px, py,
-                    (tabStatus & PM.TAB_TOP_TAB ?    "top tab" : (tabStatus & PM.TAB_TOP_BLANK ?       "top blank" :    "top straight")),
-                    (tabStatus & PM.TAB_RIGHT_TAB ?  "right tab" : (tabStatus & PM.TAB_RIGHT_BLANK ?   "right blank" :  "right straight")),
-                    (tabStatus & PM.TAB_BOTTOM_TAB ? "bottom tab" : (tabStatus & PM.TAB_BOTTOM_BLANK ? "bottom blank" : "bottom straight")),
-                    (tabStatus & PM.TAB_LEFT_TAB ?   "left tab" : (tabStatus & PM.TAB_LEFT_BLANK ?     "left blank" :   "left straight")));
-        
         
         // x coordinate of the top-left point of the piece (excluding tabs/blanks)
         var l = (tabStatus & PM.TAB_LEFT_TAB) ? m : 0;
@@ -165,6 +140,7 @@ PM.creation = (function (PM) {
         //       coordinate system whose origo is the center of a tab.
         var magic = ((m - r) / Math.sqrt(m * (2 * r - m))) * (m) + b; 
         
+        var ctx = canvas.getContext('2d');
         ctx.beginPath();
         ctx.moveTo(l, t);
             
@@ -264,10 +240,50 @@ PM.creation = (function (PM) {
         }
         ctx.lineTo(l, t);
         
+        return {
+            x: xPosCorr,
+            y: yPosCorr
+        };
+    };
+    
+    var drawPiece = function (image, game, tabStatus, px, py, w, h, rows, cols) {
+        var canvas = document.createElement("canvas");
+        
+        var sx = Math.floor(image.width / cols * px);
+        var sy = Math.floor(image.height / rows * py);
+        var sw = Math.floor(image.width / cols);
+        var sh = Math.floor(image.height / rows);
+        
+        var sm = Math.min(Math.round(image.width / cols / 5), Math.round(image.height / rows / 5));
+        
+        if (tabStatus & PM.TAB_TOP_TAB) {
+            sy -= sm;
+            sh += sm;
+        }
+        if (tabStatus & PM.TAB_BOTTOM_TAB) {
+            sh += sm;
+        }
+        if (tabStatus & PM.TAB_LEFT_TAB) {
+            sx -= sm;
+            sw += sm;
+        }
+        if (tabStatus & PM.TAB_RIGHT_TAB) {
+            sw += sm;
+        }
+        
+        console.log(px, py,
+                    (tabStatus & PM.TAB_TOP_TAB ?    "top tab" : (tabStatus & PM.TAB_TOP_BLANK ?       "top blank" :    "top straight")),
+                    (tabStatus & PM.TAB_RIGHT_TAB ?  "right tab" : (tabStatus & PM.TAB_RIGHT_BLANK ?   "right blank" :  "right straight")),
+                    (tabStatus & PM.TAB_BOTTOM_TAB ? "bottom tab" : (tabStatus & PM.TAB_BOTTOM_BLANK ? "bottom blank" : "bottom straight")),
+                    (tabStatus & PM.TAB_LEFT_TAB ?   "left tab" : (tabStatus & PM.TAB_LEFT_BLANK ?     "left blank" :   "left straight")));
+        
+        var posCorr = createPiecePathOnCanvas(canvas, tabStatus, w, h);
+        var ctx = canvas.getContext("2d");
+        
         ctx.clip();
         ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
         
-        return new PM.Piece(canvas, px, py, { x: w * px + xPosCorr, y: h * py + yPosCorr });
+        return new PM.Piece(canvas, px, py, { x: w * px + posCorr.x, y: h * py + posCorr.y });
     };
     
     return {

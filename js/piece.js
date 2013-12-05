@@ -37,6 +37,7 @@ PM.Piece = (function () {
         this.transformOrigin = { x: primitive.stroke.width / 2, y: primitive.stroke.height / 2 };
         this.grabbedTouches = [];
         this.primitives = [primitive];
+        this.neighbours = [];
     };
     
     Piece.PiecePrimitive = PiecePrimitive;
@@ -47,6 +48,8 @@ PM.Piece = (function () {
     Piece.prototype.dragStart = null;
     Piece.prototype.transformOrigin = null;
     Piece.prototype.grabbedTouches = null;
+    Piece.prototype.game = null;
+    Piece.prototype.neighbours = null;
         
     Piece.prototype.draw = function (ctx) {
         ctx.save();
@@ -90,6 +93,38 @@ PM.Piece = (function () {
         return distance < 20;
     };
     
+    Piece.prototype.mergeFeasibleNeighbours = function () {
+        for (var i = this.neighbours.length; i--; ) {
+            var neighbour = this.neighbours[i];
+            if (this.checkMergeability(neighbour)) {
+                this.merge(neighbour);
+            }
+        }
+    };
+    
+    Piece.prototype.addNeighbour = function (other) {
+        if (other === this) {
+            return;
+        }
+        
+        if (this.neighbours.indexOf(other) < 0) {
+            this.neighbours.push(other);
+        }
+        if (other.neighbours.indexOf(this) < 0) {
+            other.neighbours.push(this);
+        }
+    };
+    
+    Piece.prototype.removeNeighbour = function (other) {
+        var i;
+        if ((i = this.neighbours.indexOf(other)) >= 0) {
+            this.neighbours.splice(i, 1);
+        }
+        if ((i = other.neighbours.indexOf(this)) >= 0) {
+            other.neighbours.splice(i, 1);
+        }
+    };
+    
     Piece.prototype.merge = function (other) {
         // Supposed difference between pieces (used to correct positioning of primitives)
         var supposedDiff = { x: this.supposedPosition.x - other.supposedPosition.x, y: this.supposedPosition.y - other.supposedPosition.y };
@@ -97,9 +132,16 @@ PM.Piece = (function () {
         // Add primitives of the other piece to this piece
         for (var i = other.primitives.length; i--; ) {
             var primitive = other.primitives[i];
-            primitive.x += supposedDiff.x;
-            primitive.y += supposedDiff.y;
+            primitive.x -= supposedDiff.x;
+            primitive.y -= supposedDiff.y;
             this.primitives.push(primitive);
+        }
+        
+        // Remove neighbours from the other piece and add them to this piece
+        for (var i = other.neighbours.length; i--; ) {
+            var neighbour = other.neighbours[i];
+            other.removeNeighbour(neighbour);
+            this.addNeighbour(neighbour);
         }
         
         // Reset primitives and grabbed touch points of the other piece

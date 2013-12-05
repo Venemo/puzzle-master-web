@@ -122,6 +122,7 @@ PM.Game = (function () {
             });
             if (grabbers.length) {
                 grabbers[0].doDrag(touches[i].clientX, touches[i].clientY);
+                grabbers[0].mergeFeasibleNeighbours();
                 shouldRedraw = true;
             }
         }

@@ -98,6 +98,7 @@ PM.creation = (function (PM) {
             } //break;
         }
         
+        setNeighbours(pieces);
         return pieces;
     };
     
@@ -311,6 +312,17 @@ PM.creation = (function (PM) {
         var primitive = new PM.Piece.PiecePrimitive(stroke, canvas);
         
         return new PM.Piece(primitive, px, py, { x: w * px + posCorr.x, y: h * py + posCorr.y });
+    };
+    
+    var setNeighbours = function (pieces) {
+        for (var i = pieces.length; i --; ) {
+            var piece = pieces[i];
+            var neighbours = pieces.filter(function(p) { return (p.px === piece.px - 1 && p.py === piece.py) || (p.px === piece.px && p.py === piece.py - 1) });
+            
+            for (var z = neighbours.length; z--; ) {
+                piece.addNeighbour(neighbours[z]);
+            }
+        }
     };
     
     return {

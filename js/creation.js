@@ -10,6 +10,10 @@
 
 PM = typeof(PM) === "undefined" ? {} : PM;
 
+// Constants for operating with tabs and blanks
+// NOTES: - every piece has a tabStatus and it's a bitwise OR of these constants
+//        - if a piece has nor _TAB nor _BLANK for a side, it means that it's straight-edged on that side
+//        - assigning _TAB and _BLANK to the same side results in undefined behaviour
 (function (PM) {
     PM.TAB_BOTTOM_TAB =       1;
     PM.TAB_BOTTOM_BLANK =     2;
@@ -21,8 +25,10 @@ PM = typeof(PM) === "undefined" ? {} : PM;
     PM.TAB_RIGHT_BLANK =    128;
 })(PM);
 
+// Module that is responsible for the creation of puzzle pieces
 PM.creation = (function (PM) {
     
+    // Creates randomized but consistent tab statuses for every piece in a game
     var randomizeTabs = function (rows, cols) {
         var tabs = [];
         // Iterate through all rows and columns from left to right, from top to bottom
@@ -77,6 +83,7 @@ PM.creation = (function (PM) {
         return tabs;
     };
     
+    // Creates all puzzle pieces for a game
     var createPieces = function (image, game, rows, cols) {
         if (rows < 1 || cols < 1) {
             throw new Error("Invalid parameters");
@@ -102,6 +109,7 @@ PM.creation = (function (PM) {
         return pieces;
     };
     
+    // Plots a path with a puzzle piece shape on the given canvas defined by the given tabStatus
     var createPiecePathOnCanvas = function (canvas, tabStatus, w, h) {
         // Set basic canvas size
         canvas.width = w;
@@ -259,6 +267,7 @@ PM.creation = (function (PM) {
         };
     };
     
+    // Creates a stroke for a puzzle piece
     var createStroke = function (tabStatus, w, h) {
         var canvas = document.createElement("canvas");
         var posCorr = createPiecePathOnCanvas(canvas, tabStatus, w, h);
@@ -272,6 +281,7 @@ PM.creation = (function (PM) {
         return canvas;
     };
     
+    // Creates a single puzzle piece
     var drawPiece = function (image, game, tabStatus, px, py, w, h, rows, cols) {
         var canvas = document.createElement("canvas");
         
@@ -315,6 +325,7 @@ PM.creation = (function (PM) {
         return new PM.Piece(primitive, px, py, { x: w * px + posCorr.x, y: h * py + posCorr.y });
     };
     
+    // Sets all neighbourhood relations in a collection of puzzle pieces
     var setNeighbours = function (pieces) {
         for (var i = pieces.length; i --; ) {
             var piece = pieces[i];
@@ -326,6 +337,7 @@ PM.creation = (function (PM) {
         }
     };
     
+    // NOTE: only createPieces is exposed (it doesn't make sense to call any of the other functions from outside)
     return {
         createPieces: createPieces
     };

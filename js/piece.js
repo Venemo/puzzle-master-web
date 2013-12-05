@@ -172,6 +172,9 @@ PM.Piece = (function () {
     };
         
     Piece.prototype.mapToScene = function(p0) {
+        // NOTE: this is NOT a linear transformation because the two coordinate systems are not only rotated
+        //       but their origo is also in a different place.
+    
         var p = {
             x: p0.x - this.transformOrigin.x,
             y: p0.y - this.transformOrigin.y
@@ -185,10 +188,6 @@ PM.Piece = (function () {
             x: this.x + r.x + this.transformOrigin.x,
             y: this.y + r.y + this.transformOrigin.y
         };
-    };
-    
-    Piece.prototype.mapToOther = function (other, p) {
-        return other.mapFromScene(this.mapToScene(p));
     };
     
     Piece.prototype.mapFromScene = function(p0) {
@@ -206,6 +205,11 @@ PM.Piece = (function () {
             x: r.x + this.transformOrigin.x,
             y: r.y + this.transformOrigin.y
         };
+    };
+    
+    Piece.prototype.mapToOther = function (other, p) {
+        // Map the coordinates to the scene and then from there to the other piece
+        return other.mapFromScene(this.mapToScene(p));
     };
     
     return Piece;

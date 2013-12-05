@@ -76,7 +76,35 @@ PM.Piece = (function () {
     };
     
     Piece.prototype.checkMergeability = function (other) {
-        // TODO
+        // Check difference between angles
+        var angleDiff = Math.abs(other.angle - this.angle);
+        if (angleDiff > Math.PI / 10) {
+            return false;
+        }
+    
+        // Check difference between positions
+        var supposedDiff = { x: this.supposedPosition.x - other.supposedPosition.x, y: this.supposedPosition.y - other.supposedPosition.y };
+        var actualDiff = this.mapToOther(other, { x: 0, y: 0 });
+        var xd = supposedDiff.x - actualDiff.x, yd = supposedDiff.y - actualDiff.y;
+        var distance = Math.sqrt(xd * xd + yd * yd);
+        return distance < 20;
+    };
+    
+    Piece.prototype.merge = function (other) {
+        // Supposed difference between pieces (used to correct positioning of primitives)
+        var supposedDiff = { x: this.supposedPosition.x - other.supposedPosition.x, y: this.supposedPosition.y - other.supposedPosition.y };
+        
+        // Add primitives of the other piece to this piece
+        for (var i = other.primitives.length; i--; ) {
+            var primitive = other.primitives[i];
+            primitive.x += supposedDiff.x;
+            primitive.y += supposedDiff.y;
+            this.primitives.push(primitive);
+        }
+        
+        // Reset primitives and grabbed touch points of the other piece
+        other.primitives.length = 0;
+        other.grabbedTouches.length = 0;
     };
     
     Piece.prototype.containsPoint = function (sx, sy) {
@@ -115,6 +143,10 @@ PM.Piece = (function () {
             x: this.x + r.x + this.transformOrigin.x,
             y: this.y + r.y + this.transformOrigin.y
         };
+    };
+    
+    Piece.prototype.mapToOther = function (other, p) {
+        return other.mapFromScene(this.mapToScene(p));
     };
     
     Piece.prototype.mapFromScene = function(p0) {

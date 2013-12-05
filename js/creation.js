@@ -254,7 +254,8 @@ PM.creation = (function (PM) {
         
         return {
             x: xPosCorr,
-            y: yPosCorr
+            y: yPosCorr,
+            am: am
         };
     };
     
@@ -306,7 +307,7 @@ PM.creation = (function (PM) {
         var ctx = canvas.getContext("2d");
         
         ctx.clip();
-        ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(image, sx, sy, sw, sh, posCorr.am, posCorr.am, canvas.width - 2 * posCorr.am, canvas.height - 2 * posCorr.am);
         
         var stroke = createStroke(tabStatus, w, h);
         var primitive = new PM.Piece.PiecePrimitive(stroke, canvas);

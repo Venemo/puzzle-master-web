@@ -162,6 +162,7 @@ PM.creation = (function (PM) {
         //       expressed in a coordinate system whose origo is the center of a tab.
         var magic = ((m - r) / Math.sqrt(m * (2 * r - m))) * (m) + b; 
         
+        // Start carving the piece shape
         var ctx = canvas.getContext('2d');
         ctx.beginPath();
         ctx.moveTo(l, t);
@@ -262,6 +263,7 @@ PM.creation = (function (PM) {
         }
         ctx.lineTo(l, t);
         
+        // Return information that will help correctly position the drawImage() call when drawing to this canvas
         return {
             x: xPosCorr,
             y: yPosCorr,
@@ -272,10 +274,15 @@ PM.creation = (function (PM) {
     
     // Creates a stroke for a puzzle piece
     var createStroke = function (tabStatus, w, h) {
+        // TODO: cache strokes for a given tabStatus
+    
+        // Create a canvas
         var canvas = document.createElement("canvas");
+        // Carve puzzle piece shape on the canvas
         var posCorr = createPiecePathOnCanvas(canvas, tabStatus, w, h);
-        var ctx = canvas.getContext('2d');
         
+        // Draw the actual stroke
+        var ctx = canvas.getContext('2d');
         ctx.fillStyle = ctx.strokeStyle = "#fdfdfd";
         ctx.lineWidth = 4;
         ctx.stroke();
@@ -287,18 +294,26 @@ PM.creation = (function (PM) {
     // Creates a single puzzle piece
     var drawPiece = function (image, game, tabStatus, px, py, w, h, rows, cols) {
         var canvas = document.createElement("canvas");
+        // Carve the puzzle piece shaped path onto the canvas and get information about how to render on it
         var posCorr = createPiecePathOnCanvas(canvas, tabStatus, w, h);
         
+        // Default source coordinates
         var sx = Math.floor(image.width / cols * px);
         var sy = Math.floor(image.height / rows * py);
         var sw = Math.floor(image.width / cols);
         var sh = Math.floor(image.height / rows);
         
+        // Source margin
         var sm = Math.min(Math.round(image.width / cols / 5), Math.round(image.height / rows / 5));
+        // Tab tolerance value transformed to the source image's dimensions
         var swTabTolerance = posCorr.tabTolerance / w * image.width;
         var shTabTolerance = posCorr.tabTolerance / h * image.height;
+        // How much to adjust the destination image
         var destinationAdjustment = { x: 0, y: 0, w: 0, h: 0 };
+        // TODO: since most of the time property values of destinationAdjustment will remain 0, maybe use a prototype for it
         
+        // Now adjust everything, taking into account the tabs
+        // NOTE: these could be compacted into one-liners but then the code'd be extremely unreadable
         if (tabStatus & PM.TAB_TOP_TAB) {
             sy -= sm + shTabTolerance;
             sh += sm + shTabTolerance;
@@ -320,20 +335,25 @@ PM.creation = (function (PM) {
             destinationAdjustment.w += posCorr.tabTolerance;
         }
         
+        // Print tab statuses
         console.log(px, py,
                     (tabStatus & PM.TAB_TOP_TAB ?    "top tab" : (tabStatus & PM.TAB_TOP_BLANK ?       "top blank" :    "top straight")),
                     (tabStatus & PM.TAB_RIGHT_TAB ?  "right tab" : (tabStatus & PM.TAB_RIGHT_BLANK ?   "right blank" :  "right straight")),
                     (tabStatus & PM.TAB_BOTTOM_TAB ? "bottom tab" : (tabStatus & PM.TAB_BOTTOM_BLANK ? "bottom blank" : "bottom straight")),
                     (tabStatus & PM.TAB_LEFT_TAB ?   "left tab" : (tabStatus & PM.TAB_LEFT_BLANK ?     "left blank" :   "left straight")));
         
+        // Draw destination image on the canvas
         var ctx = canvas.getContext("2d");
-        
         ctx.clip();
         ctx.drawImage(image, sx, sy, sw, sh, posCorr.am + destinationAdjustment.x, posCorr.am + destinationAdjustment.y, canvas.width - 2 * posCorr.am + destinationAdjustment.w, canvas.height - 2 * posCorr.am + destinationAdjustment.h);
         
+        // Create stroke for the piece
         var stroke = createStroke(tabStatus, w, h);
+        
+        // Instantiate the starting PiecePrimitive instance for the piece
         var primitive = new PM.Piece.PiecePrimitive(stroke, canvas);
         
+        // Now instantiate the piece itself
         return new PM.Piece(primitive, px, py, { x: w * px + posCorr.x, y: h * py + posCorr.y });
     };
     

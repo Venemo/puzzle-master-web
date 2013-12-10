@@ -51,15 +51,27 @@ It's highly efficient because:
 * It can be fully stopped so the loop doesn't have to run when nothing's happening
 * It can drive animations using the timestamp it receives from `requestAnimationFrame` so you should **never** use `setTimeout` for it
 
+An animation can smoothly animate a `number` property of an object. (Currently easing functions are not supported.)
+
 #### PM.Piece
 
-A piece manages an individual puzzle piece. Its responsibilities are the following:
+`Piece` manages an individual puzzle piece. Its responsibilities are the following:
 
 * Do coordinate transformations from the piece to the scene and other pieces
 * Draw the piece
 * Decide if a given point belongs to the piece (used to determine which piece the user clicked on)
 * Decide when the piece is positioned in such a way that it can be merged with other pieces
+* When a piece doesn't have any neighbours, the game has been won!
 
+#### PM.Piece.PiecePrimitive
+
+`PiecePrimitive` represents a single primitive part of a puzzle piece. Initially, every piece has one primitive,
+and when they snap together, the merging is done by removing all primitives from one piece and adding them to the other.  
+It contains the following properties:
+
+* `x` and `y` are the coordinates to which the primitive should be drawn inside the piece's coordinate system
+* `image` is the puzzle piece shaped image
+* `stroke` is the white outline painted under `image`
 
 
 

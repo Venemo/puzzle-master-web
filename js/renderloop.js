@@ -88,7 +88,8 @@ PM.RenderLoop = (function () {
     RenderLoop.prototype.createNumberAnimation = function (duration, obj, prop, from, to) {
         var anim = new NumberAnimation(this, duration, obj, prop, from, to);
         return {
-            start: function () { anim.start(); }
+            start: function () { anim.start(); },
+            setOnCompleted: function (cb) { anim.onCompleted = cb; }
         };
     };
 
@@ -148,14 +149,6 @@ PM.RenderLoop = (function () {
         };
     };
     
-    NumberAnimation.prototype.start = function () {
-        if (this.duration === 0)
-            return;
-        
-        this.renderLoop.addCallback(this.renderLoopCallback);
-        this.renderLoop.addLoopRequest();
-    };
-    
     NumberAnimation.prototype.from = 0;
     NumberAnimation.prototype.to = 0;
     NumberAnimation.prototype.obj = 0;
@@ -164,6 +157,15 @@ PM.RenderLoop = (function () {
     NumberAnimation.prototype.duration = 0;
     NumberAnimation.prototype.prevTime = 0;
     NumberAnimation.prototype.elapsed = 0;
+    NumberAnimation.prototype.onCompleted = null;
+    
+    NumberAnimation.prototype.start = function () {
+        if (this.duration === 0)
+            return;
+        
+        this.renderLoop.addCallback(this.renderLoopCallback);
+        this.renderLoop.addLoopRequest();
+    };
     
     NumberAnimation.prototype.tick = function (t) {
         //console.log("animation tick called");
@@ -184,9 +186,40 @@ PM.RenderLoop = (function () {
         
         if (this.elapsed >= this.duration) {
             //console.log("animation tick: stopping animation");
+            
+            // Set property to its final value
             this.obj[this.prop] = this.to;
+            
+            // Remove animation from render loop
             this.renderLoop.removeCallback(this.renderLoopCallback);
             this.renderLoop.removeLoopRequest();
+            
+            // Take care of the onCompleted callback by abusing the render loop callbacks
+            // NOTE: this is done to ensure that everything's been painted properly by the time onCompleted is called
+            if (this.onCompleted) {
+                var that = this;
+                var cb1 = function () {
+                    // Remove cb1
+                    that.renderLoop.removeCallback(cb1);
+                    // Mark as dirty
+                    that.renderLoop.markDirty();
+                    
+                    var cb2 = function () {
+                        // Mark as dirty
+                        that.renderLoop.markDirty();
+                        // Remove cb2
+                        that.renderLoop.removeCallback(cb2);
+                        // Execute the actual callback
+                        that.onCompleted();
+                    }
+                    
+                    // Add cb2
+                    that.renderLoop._callbacks.unshift(cb2);
+                };
+                
+                // Add cb1
+                this.renderLoop._callbacks.unshift(cb1);
+            }
         }
     };
     

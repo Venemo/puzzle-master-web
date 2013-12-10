@@ -148,7 +148,12 @@ PM.Game = (function () {
         var animY = this.renderLoop.createNumberAnimation(duration, this.pieces[0], "y", this.pieces[0].supposedPosition.y);
         animX.start();
         animY.start();
-        console.log(this.pieces[0].x, this.pieces[0].y, this.pieces[0].supposedPosition.x, this.pieces[0].supposedPosition.y);
+        
+        var that = this;
+        animY.setOnCompleted(function () {
+            // TODO: replace this with something better looking
+            alert("Congrats, you've won!");
+        });
         
         this.renderLoop.markDirty();
     };

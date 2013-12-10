@@ -8,13 +8,10 @@
 //
 // Copyright 2013, Timur Kristóf
 
-var pmApp = (function () {
+var pmApp = (function () {    
     var mainCanvas = document.getElementById("maincanvas");
     mainCanvas.width = document.documentElement.clientWidth;
     mainCanvas.height = document.documentElement.clientHeight;
-
-    var btnRestart = document.getElementById("btn-restart");
-    btnRestart.onclick = function() { startGame(); };
 
     var ctx = mainCanvas.getContext("2d");
     var renderLoop = new PM.RenderLoop(function () { if (game) game.draw(ctx); });
@@ -71,15 +68,11 @@ var pmApp = (function () {
         e.preventDefault();
     });
 
-    var startGame = function () {
+    var imageChooser = new PM.ImageChooser("pm-imagechooser", function (image) {
         console.log("starting game");
-        var image = new Image();
-        image.onload = function() {
-            game = new PM.Game(image, 2, 3, renderLoop);
-            renderLoop.start();
-        };
-        image.src = "images/image4.jpg";
-    };
+        game = new PM.Game(image, 2, 3, renderLoop);
+        renderLoop.start();
+    });
     
     return {
         getGame: function () { return game; },

@@ -1,3 +1,6 @@
+
+/* Basics */
+
 div, body, canvas, img {
     padding: 0;
     margin: 0;
@@ -5,9 +8,9 @@ div, body, canvas, img {
 body {
     background: url(../images/background.jpg);
 }
-#maincanvas {
 
-}
+/* Game UI */
+
 #game-ui {
     position: absolute;
     top: 0;
@@ -15,6 +18,9 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
+}
+#maincanvas {
+
 }
 #loading-ui {
     position: absolute;
@@ -25,9 +31,41 @@ body {
     font-size: 120%;
     text-align: center;
 }
-#btn-restart {
+
+/* Image chooser UI */
+
+#pm-imagechooser {
     position: absolute;
-    top: 5px;
-    left: 5px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+}
+#pm-maintitle {
+    background: #a909a7;
+    color: #fff;
+    margin: 0;
+    padding: 15px 5px;
+    box-shadow: rgba(0, 0, 0, 0.8) 0 0 5px;
+}
+#pm-imagechooser-list {
+    /*background: linear-gradient(rgba(255, 255, 255, 0), rgba(0, 0, 0, 0.3)) fixed;*/
+}
+.pm-imagechooser-image {
+    float: left;
+    width: 28%;
+    margin: 20px 0 0 4%;
+    text-align: center;
+}
+.pm-imagechooser-image img {
+    border: 3px solid #fff;
+    width: 100%;
+    box-shadow: rgba(0, 0, 0, 0.8) 0 0 5px;
+}
+.clearfix {
+    clear: both;
+    float: none;
+    display: block;
 }
 

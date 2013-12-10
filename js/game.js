@@ -13,18 +13,21 @@ PM = typeof(PM) === "undefined" ? {} : PM;
 PM.Game = (function () {
     
     var Game = function Game (image, rows, cols, renderLoop) {
-        var that = this;
         this.bigImage = image;
         this.rows = rows;
         this.cols = cols;
         this.renderLoop = renderLoop;
         this.pieces = PM.creation.createPieces(image, this, rows, cols);
         
+        var that = this;
+        
         setTimeout(function() { that.shuffle(600); }, 500);
-        setTimeout(function() { that.shuffle(600); that.isReady = true; }, 1200);
+        setTimeout(function() { that.shuffle(600); }, 1200);
+        setTimeout(function() { that.isInteractive = true; }, 1900);
     };
     
-    Game.prototype.isReady = false;
+    Game.prototype.isInteractive = false;
+    Game.prototype.isWon = false;
     
     Game.prototype.shuffle = function (duration) {
         for (var i = 0; i < this.pieces.length; i++) {
@@ -60,7 +63,7 @@ PM.Game = (function () {
     };
     
     Game.prototype.reactToTouchStart = function (touches) {
-        if (!this.isReady) {
+        if (!this.isInteractive) {
             return;
         }
     
@@ -90,7 +93,7 @@ PM.Game = (function () {
     };
     
     Game.prototype.reactToTouchEnd = function (touches) {
-        if (!this.isReady) {
+        if (!this.isInteractive) {
             return;
         }
         
@@ -111,17 +114,20 @@ PM.Game = (function () {
     };
     
     Game.prototype.reactToTouchMove = function (touches) {
-        if (!this.isReady) {
+        if (!this.isInteractive) {
             return;
         }
         
         var shouldRedraw = false;
         for (var i = 0; i < touches.length; i++) {
+            //console.log("reaction to touch", i, "of", touches.length, touches[i].identifier);
+            
             var grabbers = this.pieces.filter(function(p) {
                 return p.grabbedTouches.some(function(id) { return id === touches[i].identifier; });
             });
             if (grabbers.length) {
                 grabbers[0].doDrag(touches[i].clientX, touches[i].clientY);
+                //console.log("calling mergeFeasibleNeighbours on", grabbers[0].px, grabbers[0].py);
                 grabbers[0].mergeFeasibleNeighbours();
                 shouldRedraw = true;
             }
@@ -129,6 +135,22 @@ PM.Game = (function () {
         if (shouldRedraw) {
             this.renderLoop.markDirty();
         }
+    };
+    
+    Game.prototype.winNow = function () {
+        // Set flags
+        this.isWon = true;
+        this.isInteractive = false;
+        
+        // Animate the piece to its supposed position
+        var duration = 900;
+        var animX = this.renderLoop.createNumberAnimation(duration, this.pieces[0], "x", this.pieces[0].supposedPosition.x);
+        var animY = this.renderLoop.createNumberAnimation(duration, this.pieces[0], "y", this.pieces[0].supposedPosition.y);
+        animX.start();
+        animY.start();
+        console.log(this.pieces[0].x, this.pieces[0].y, this.pieces[0].supposedPosition.x, this.pieces[0].supposedPosition.y);
+        
+        this.renderLoop.markDirty();
     };
     
     return Game;

@@ -44,7 +44,8 @@ PM.Piece = (function () {
 
     // Constructor -----------------------------------------
     
-    var Piece = function Piece (primitive, px, py, supposedPosition) {
+    var Piece = function Piece (game, primitive, px, py, supposedPosition) {
+        this.game = game;
         this.px = px;
         this.py = py;
         this.supposedPosition = supposedPosition;
@@ -131,11 +132,18 @@ PM.Piece = (function () {
     
     // Goes through all neighbours of this piece, check if they can be merged and merges them if they can
     Piece.prototype.mergeFeasibleNeighbours = function () {
+        // Go through neighbours and do the thing
         for (var i = this.neighbours.length; i--; ) {
             var neighbour = this.neighbours[i];
-            if (this.checkMergeability(neighbour)) {
+            if (this.checkMergeability(neighbour) && neighbour.checkMergeability(this)) {
+                //console.log("calling merge between", this.px, this.py, "and", neighbour.px, neighbour.py);
                 this.merge(neighbour);
             }
+        }
+        
+        // Check if the game has been won
+        if (this.neighbours.length === 0) {
+            this.game.winNow();
         }
     };
     
@@ -166,6 +174,17 @@ PM.Piece = (function () {
     
     // Merges the other piece into this piece
     Piece.prototype.merge = function (other) {
+        // Check if this piece has already been merged into another
+        if (this.primitives.length === 0) {
+            return;
+        }
+        // Don't merge with self
+        if (other === this) {
+            return;
+        }
+        
+        console.log("merging", this.px, this.py, "with", other.px, other.py);
+        
         // Supposed difference between pieces (used to correct positioning of primitives)
         var supposedDiff = { x: this.supposedPosition.x - other.supposedPosition.x, y: this.supposedPosition.y - other.supposedPosition.y };
         
@@ -180,13 +199,24 @@ PM.Piece = (function () {
         // Remove neighbours from the other piece and add them to this piece
         for (var i = other.neighbours.length; i--; ) {
             var neighbour = other.neighbours[i];
+            if (neighbour === this) {
+                continue;
+            }
+            
             other.removeNeighbour(neighbour);
             this.addNeighbour(neighbour);
         }
         
+        // Remove the other piece from neighbours
+        this.removeNeighbour(other);
+        
         // Reset primitives and grabbed touch points of the other piece
         other.primitives.length = 0;
         other.grabbedTouches.length = 0;
+        
+        // Remove other from the game
+        var i = this.game.pieces.indexOf(other);
+        this.game.pieces.splice(i, 1);
     };
     
     // Tells if this piece contains a clickable area at a given point (in scene coordinates)

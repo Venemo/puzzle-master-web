@@ -354,7 +354,7 @@ PM.creation = (function (PM) {
         var primitive = new PM.Piece.PiecePrimitive(stroke, canvas);
         
         // Now instantiate the piece itself
-        return new PM.Piece(primitive, px, py, { x: w * px + posCorr.x, y: h * py + posCorr.y });
+        return new PM.Piece(game, primitive, px, py, { x: w * px + posCorr.x, y: h * py + posCorr.y });
     };
     
     // Sets all neighbourhood relations in a collection of puzzle pieces

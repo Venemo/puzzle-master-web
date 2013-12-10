@@ -8,7 +8,7 @@
 //
 // Copyright 2013, Timur Kristóf
 
-(function () {
+var pmApp = (function () {
     var mainCanvas = document.getElementById("maincanvas");
     mainCanvas.width = document.documentElement.clientWidth;
     mainCanvas.height = document.documentElement.clientHeight;
@@ -79,6 +79,11 @@
             renderLoop.start();
         };
         image.src = "images/image4.jpg";
+    };
+    
+    return {
+        getGame: function () { return game; },
+        getRenderLoop: function () { return renderLoop; }
     };
 })();
 

@@ -15,14 +15,14 @@ PM = typeof(PM) === "undefined" ? {} : PM;
 //        - if a piece has nor _TAB nor _BLANK for a side, it means that it's straight-edged on that side
 //        - assigning _TAB and _BLANK to the same side results in undefined behaviour
 (function (PM) {
-    PM.TAB_BOTTOM_TAB =       1;
-    PM.TAB_BOTTOM_BLANK =     2;
-    PM.TAB_TOP_TAB =          4;
-    PM.TAB_TOP_BLANK =        8;
-    PM.TAB_LEFT_TAB =        16;
-    PM.TAB_LEFT_BLANK =      32;
-    PM.TAB_RIGHT_TAB =       64;
-    PM.TAB_RIGHT_BLANK =    128;
+    PM.TAB_BOTTOM_TAB =     1<<0;
+    PM.TAB_BOTTOM_BLANK =   1<<1;
+    PM.TAB_TOP_TAB =        1<<2;
+    PM.TAB_TOP_BLANK =      1<<3;
+    PM.TAB_LEFT_TAB =       1<<4;
+    PM.TAB_LEFT_BLANK =     1<<5;
+    PM.TAB_RIGHT_TAB =      1<<6;
+    PM.TAB_RIGHT_BLANK =    1<<7;
 })(PM);
 
 // Module that is responsible for the creation of puzzle pieces

@@ -284,7 +284,7 @@ PM.creation = (function (PM) {
         // Draw the actual stroke
         var ctx = canvas.getContext('2d');
         ctx.fillStyle = ctx.strokeStyle = "#fdfdfd";
-        ctx.lineWidth = 4;
+        ctx.lineWidth = PM.Piece.PiecePrimitive.strokeSize * 2;
         ctx.stroke();
         ctx.fill();
         

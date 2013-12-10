@@ -117,6 +117,8 @@ PM.creation = (function (PM) {
         
         // Margin (are occupied by tabs)
         var m = Math.min(Math.round(w / 5), Math.round(h / 5));
+        // To avoid a minor rendering glitch, tabs are a bit wider than blanks
+        var tabTolerance = 2;
         // Positioning corrections
         var xPosCorr = 0;
         var yPosCorr = 0;
@@ -156,8 +158,8 @@ PM.creation = (function (PM) {
         // NOTE: At some point I actually spent a whole evening on this one, and calculating this formula
         //       involved coordinate geometry and differential calculus. There are three pages of calculations
         //       in a notebook for this. (With drawings too, yay!)
-        //       Basically, it's the y coordinate of the control point used by arcTo() expressed in a
-        //       coordinate system whose origo is the center of a tab.
+        //       Basically, it's the y coordinate of the control point used by arcTo() for the right tab,
+        //       expressed in a coordinate system whose origo is the center of a tab.
         var magic = ((m - r) / Math.sqrt(m * (2 * r - m))) * (m) + b; 
         
         var ctx = canvas.getContext('2d');
@@ -166,8 +168,8 @@ PM.creation = (function (PM) {
             
         // top-left to top-right
         if (tabStatus & PM.TAB_TOP_TAB) {
-            var y1 = t - m;
-            var x1 = l + w / 2 + magic;
+            var y1 = t - m - tabTolerance;
+            var x1 = l + w / 2 + magic - tabTolerance;
             var y2 = y1;
             var x2 = t + h / 2;
             
@@ -189,8 +191,8 @@ PM.creation = (function (PM) {
         
         // top-right to bottom-right
         if (tabStatus & PM.TAB_RIGHT_TAB) {
-            var x1 = l + w + m;
-            var y1 = t + h / 2 + magic;
+            var x1 = l + w + m + tabTolerance;
+            var y1 = t + h / 2 + magic + tabTolerance;
             var x2 = x1;
             var y2 = t + h / 2;
             //console.log("m=" + String(m), "w=" + String(w), "h=" + String(h), "t=" + String(t), "l=" + String(l), "x1=" + String(x1), "y1=" + String(y1), "x2=" + String(x2), "y2=" + String(y2), "r=" + String(r));
@@ -216,8 +218,8 @@ PM.creation = (function (PM) {
         
         // bottom-right to bottom-left
         if (tabStatus & PM.TAB_BOTTOM_TAB) {
-            var y1 = t + h + m;
-            var x1 = l + w / 2 + magic;
+            var y1 = t + h + m + tabTolerance;
+            var x1 = l + w / 2 + magic + tabTolerance;
             var y2 = y1;
             var x2 = t + h / 2;
             
@@ -239,8 +241,8 @@ PM.creation = (function (PM) {
         
         // bottom-left to top-left
         if (tabStatus & PM.TAB_LEFT_TAB) {
-            var x1 = l - m;
-            var y1 = t + h / 2 + magic;
+            var x1 = l - m - tabTolerance;
+            var y1 = t + h / 2 + magic - tabTolerance;
             var x2 = x1;
             var y2 = t + h / 2;
             
@@ -263,7 +265,8 @@ PM.creation = (function (PM) {
         return {
             x: xPosCorr,
             y: yPosCorr,
-            am: am
+            am: am,
+            tabTolerance: tabTolerance
         };
     };
     
@@ -284,6 +287,7 @@ PM.creation = (function (PM) {
     // Creates a single puzzle piece
     var drawPiece = function (image, game, tabStatus, px, py, w, h, rows, cols) {
         var canvas = document.createElement("canvas");
+        var posCorr = createPiecePathOnCanvas(canvas, tabStatus, w, h);
         
         var sx = Math.floor(image.width / cols * px);
         var sy = Math.floor(image.height / rows * py);
@@ -291,20 +295,29 @@ PM.creation = (function (PM) {
         var sh = Math.floor(image.height / rows);
         
         var sm = Math.min(Math.round(image.width / cols / 5), Math.round(image.height / rows / 5));
+        var swTabTolerance = posCorr.tabTolerance / w * image.width;
+        var shTabTolerance = posCorr.tabTolerance / h * image.height;
+        var destinationAdjustment = { x: 0, y: 0, w: 0, h: 0 };
         
         if (tabStatus & PM.TAB_TOP_TAB) {
-            sy -= sm;
-            sh += sm;
+            sy -= sm + shTabTolerance;
+            sh += sm + shTabTolerance;
+            destinationAdjustment.y -= posCorr.tabTolerance;
+            destinationAdjustment.h += posCorr.tabTolerance;
         }
         if (tabStatus & PM.TAB_BOTTOM_TAB) {
-            sh += sm;
+            sh += sm + shTabTolerance;
+            destinationAdjustment.h += posCorr.tabTolerance;
         }
         if (tabStatus & PM.TAB_LEFT_TAB) {
-            sx -= sm;
-            sw += sm;
+            sx -= sm + swTabTolerance;
+            sw += sm + swTabTolerance;
+            destinationAdjustment.x -= posCorr.tabTolerance;
+            destinationAdjustment.w += posCorr.tabTolerance;
         }
         if (tabStatus & PM.TAB_RIGHT_TAB) {
-            sw += sm;
+            sw += sm + swTabTolerance;
+            destinationAdjustment.w += posCorr.tabTolerance;
         }
         
         console.log(px, py,
@@ -313,11 +326,10 @@ PM.creation = (function (PM) {
                     (tabStatus & PM.TAB_BOTTOM_TAB ? "bottom tab" : (tabStatus & PM.TAB_BOTTOM_BLANK ? "bottom blank" : "bottom straight")),
                     (tabStatus & PM.TAB_LEFT_TAB ?   "left tab" : (tabStatus & PM.TAB_LEFT_BLANK ?     "left blank" :   "left straight")));
         
-        var posCorr = createPiecePathOnCanvas(canvas, tabStatus, w, h);
         var ctx = canvas.getContext("2d");
         
         ctx.clip();
-        ctx.drawImage(image, sx, sy, sw, sh, posCorr.am, posCorr.am, canvas.width - 2 * posCorr.am, canvas.height - 2 * posCorr.am);
+        ctx.drawImage(image, sx, sy, sw, sh, posCorr.am + destinationAdjustment.x, posCorr.am + destinationAdjustment.y, canvas.width - 2 * posCorr.am + destinationAdjustment.w, canvas.height - 2 * posCorr.am + destinationAdjustment.h);
         
         var stroke = createStroke(tabStatus, w, h);
         var primitive = new PM.Piece.PiecePrimitive(stroke, canvas);

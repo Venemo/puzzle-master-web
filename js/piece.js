@@ -165,8 +165,11 @@ PM.Piece = (function () {
             // Check canvas image data
             var ctx = primitive.stroke.getContext('2d');
             var imageData = ctx.getImageData(p.x, p.y, 1, 1);
-            return imageData.data[3] > 0;
+            if (imageData.data[3] > 0) {
+                return true;
+            }
         }
+        return false;
         
         // TODO: skip checking image data for obvious places (like, the rectangle which surely doesn't belong to neither tabs nor blanks
     };

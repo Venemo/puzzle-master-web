@@ -24,6 +24,9 @@ PM = typeof(PM) === "undefined" ? {} : PM;
     PM.TAB_RIGHT_TAB =      1<<6;
     PM.TAB_RIGHT_BLANK =    1<<7;
 })(PM);
+    
+// Uncomment this for debugging purposes
+//PM.debugShapes = true;
 
 // Module that is responsible for the creation of puzzle pieces
 PM.creation = (function (PM) {
@@ -166,23 +169,43 @@ PM.creation = (function (PM) {
         var ctx = canvas.getContext('2d');
         ctx.beginPath();
         ctx.moveTo(l, t);
+        
+        var drawPoint = function (fillStyle, x, y) {
+            ctx.fillStyle = fillStyle;
+            ctx.fillRect(x - 2, y - 2, 5, 5);
+        };
             
         // top-left to top-right
         if (tabStatus & PM.TAB_TOP_TAB) {
             var y1 = t - m - tabTolerance;
-            var x1 = l + w / 2 + magic - tabTolerance;
+            var x1 = l + w / 2 + magic + tabTolerance;
             var y2 = y1;
-            var x2 = t + h / 2;
+            var x2 = l + w / 2;
+            
+            if (PM.debugShapes) {
+                drawPoint("red", 2 * l + w - x1, y1);
+                drawPoint("blue", x2, y2);
+                drawPoint("darkred", x1, y1);
+                drawPoint("darkblue", l + w / 2 + b, t);
+            }
             
             ctx.lineTo(l + w / 2 - b, t);
             ctx.arcTo(2 * l + w - x1, y1, x2, y2, r);
             ctx.arcTo(x1, y1, l + w / 2 + b, t, r);
+            ctx.lineTo(l + w / 2 + b, t);
         }
         else if (tabStatus & PM.TAB_TOP_BLANK) {
             var y1 = t + m;
             var x1 = l + w / 2 + magic;
             var y2 = y1;
-            var x2 = t + h / 2;
+            var x2 = l + w / 2;
+            
+            if (PM.debugShapes) {
+                drawPoint("red", 2 * l + w - x1, y1);
+                drawPoint("blue", x2, y2);
+                drawPoint("darkred", x1, y1);
+                drawPoint("darkblue", l + w / 2 + b, t);
+            }
             
             ctx.lineTo(l + w / 2 - b, t);
             ctx.arcTo(2 * l + w - x1, y1, x2, y2, r);
@@ -198,11 +221,18 @@ PM.creation = (function (PM) {
             var y2 = t + h / 2;
             //console.log("m=" + String(m), "w=" + String(w), "h=" + String(h), "t=" + String(t), "l=" + String(l), "x1=" + String(x1), "y1=" + String(y1), "x2=" + String(x2), "y2=" + String(y2), "r=" + String(r));
             
+            if (PM.debugShapes) {
+                drawPoint("red", x1, 2 * t + h - y1);
+                drawPoint("blue", x2, y2);
+                drawPoint("darkred", x1, y1);
+                drawPoint("darkblue", l + w, t + h / 2 + b);
+            }
+            
             ctx.lineTo(l + w, t + h / 2 - b);
             ctx.arcTo(x1, 2 * t + h - y1, x2, y2, r);
             //ctx.lineTo(x2, y2); // uncomment when debugging the arcs
             ctx.arcTo(x1, y1, l + w, t + h / 2 + b, r);
-            //ctx.lineTo(l + w, t + h / 2 + b); // uncomment when debugging the arcs
+            ctx.lineTo(l + w, t + h / 2 + b);
             
         }
         else if (tabStatus & PM.TAB_RIGHT_BLANK) {
@@ -210,6 +240,13 @@ PM.creation = (function (PM) {
             var y1 = t + h / 2 + magic;
             var x2 = x1;
             var y2 = t + h / 2;
+            
+            if (PM.debugShapes) {
+                drawPoint("red", x1, 2 * t + h - y1);
+                drawPoint("blue", x2, y2);
+                drawPoint("darkred", x1, y1);
+                drawPoint("darkblue", l + w, t + h / 2 + b);
+            }
             
             ctx.lineTo(l + w, t + h / 2 - b);
             ctx.arcTo(x1, 2 * t + h - y1, x2, y2, r);
@@ -222,17 +259,32 @@ PM.creation = (function (PM) {
             var y1 = t + h + m + tabTolerance;
             var x1 = l + w / 2 + magic + tabTolerance;
             var y2 = y1;
-            var x2 = t + h / 2;
+            var x2 = l + w / 2;
+            
+            if (PM.debugShapes) {
+                drawPoint("red", x1, y1);
+                drawPoint("blue", x2, y2);
+                drawPoint("darkred", 2 * l + w - x1, y1);
+                drawPoint("darkblue", l + w / 2 - b, t + h);
+            }
             
             ctx.lineTo(l + w / 2 + b, t + h);
             ctx.arcTo(x1, y1, x2, y2, r);
             ctx.arcTo(2 * l + w - x1, y1, l + w / 2 - b, t + h, r);
+            ctx.lineTo(l + w / 2 - b, t + h);
         }
         else if (tabStatus & PM.TAB_BOTTOM_BLANK) {
             var y1 = t + h - m;
             var x1 = l + w / 2 + magic;
             var y2 = y1;
-            var x2 = t + h / 2;
+            var x2 = l + w / 2;
+            
+            if (PM.debugShapes) {
+                drawPoint("red", x1, y1);
+                drawPoint("blue", x2, y2);
+                drawPoint("darkred", 2 * l + w - x1, y1);
+                drawPoint("darkblue", l + w / 2 - b, t + h);
+            }
             
             ctx.lineTo(l + w / 2 + b, t + h);
             ctx.arcTo(x1, y1, x2, y2, r);
@@ -243,19 +295,34 @@ PM.creation = (function (PM) {
         // bottom-left to top-left
         if (tabStatus & PM.TAB_LEFT_TAB) {
             var x1 = l - m - tabTolerance;
-            var y1 = t + h / 2 + magic - tabTolerance;
+            var y1 = t + h / 2 + magic + tabTolerance;
             var x2 = x1;
             var y2 = t + h / 2;
+            
+            if (PM.debugShapes) {
+                drawPoint("red", x1, y1);
+                drawPoint("blue", x2, y2);
+                drawPoint("darkred", x1, 2 * t + h - y1);
+                drawPoint("darkblue", l, t + h / 2 - b);
+            }
             
             ctx.lineTo(l, t + h / 2 + b);
             ctx.arcTo(x1, y1, x2, y2, r);
             ctx.arcTo(x1, 2 * t + h - y1, l, t + h / 2 - b, r);
+            ctx.lineTo(l, t + h / 2 - b);
         }
         else if (tabStatus & PM.TAB_LEFT_BLANK) {
             var x1 = l + m;
             var y1 = t + h / 2 + magic;
             var x2 = x1;
             var y2 = t + h / 2;
+            
+            if (PM.debugShapes) {
+                drawPoint("red", x1, y1);
+                drawPoint("blue", x2, y2);
+                drawPoint("darkred", x1, 2 * t + h - y1);
+                drawPoint("darkblue", l, t + h / 2 - b);
+            }
             
             ctx.lineTo(l, t + h / 2 + b);
             ctx.arcTo(x1, y1, x2, y2, r);
@@ -345,6 +412,9 @@ PM.creation = (function (PM) {
         // Draw destination image on the canvas
         var ctx = canvas.getContext("2d");
         ctx.clip();
+        if (PM.debugShapes) {
+            ctx.globalAlpha = 0.4;
+        }
         ctx.drawImage(image, sx, sy, sw, sh, posCorr.am + destinationAdjustment.x, posCorr.am + destinationAdjustment.y, canvas.width - 2 * posCorr.am + destinationAdjustment.w, canvas.height - 2 * posCorr.am + destinationAdjustment.h);
         
         // Create stroke for the piece

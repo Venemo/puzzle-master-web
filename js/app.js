@@ -22,6 +22,14 @@ var pmApp = (function () {
         gameUi.startGame(image, cols, rows);
     });
     
+    // Wireup about box
+    var aboutBox = document.getElementById("pm-aboutbox");
+    var aboutBoxCancel = aboutBox.querySelector(".pm-cancel");
+    aboutBoxCancel.addEventListener("click", function (e) {
+        aboutBox.style.display = "none";
+    });
+    
+    
     // Expose the objects (for debugging purposes)
     return {
         gameUi: gameUi,

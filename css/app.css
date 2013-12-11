@@ -15,6 +15,10 @@ body {
     font-family: "Fira Sans Regular", "Cantarell", "Open Sans", sans-serif;
 }
 
+a {
+    color: #9fce00;
+}
+
 .pm-mainview {
     position: absolute;
     top: 0;

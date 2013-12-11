@@ -89,6 +89,8 @@ PM.ImageChooser = (function () {
     function ImageChooser (chosenCallback) {
         var chooserUi = document.getElementById("pm-imagechooser");
         var difficultyDialog = document.getElementById("pm-difficulty");
+        var aboutBox = document.getElementById("pm-aboutbox");
+        var optionsButton = document.getElementById("pm-imagechooser-options");
         var image = null;
         
         // TODO: load persisted values of colsSpan and rowsSpan
@@ -99,6 +101,11 @@ PM.ImageChooser = (function () {
             chooserUi.style.display = "none";
             // Call callback
             chosenCallback(image, cols, rows);
+        });
+        
+        // Wire up options button
+        optionsButton.addEventListener("click", function (e) {
+            aboutBox.style.display = "block";
         });
         
         // Wire up clicking on an image

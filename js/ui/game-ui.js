@@ -36,6 +36,7 @@ PM.GameUi = (function () {
         var gameUiElement = document.getElementById("pm-game-ui");
         var mainCanvas = document.getElementById("pm-maincanvas");
         var wonDialog = wireupWonDialog(document.getElementById("pm-gamewon"), this, onChooseOther);
+        var aboutBox = document.getElementById("pm-aboutbox");
         var ctx = mainCanvas.getContext("2d");
         var game;
         var chosenImage, chosenCols, chosenRows;
@@ -73,6 +74,11 @@ PM.GameUi = (function () {
         var gameMenuBack = document.getElementById("pm-game-menu-back");
         gameMenuBack.addEventListener("click", function (e) {
             gameMenu.style.display = "none";
+        });
+        var gameMenuAbout = document.getElementById("pm-game-menu-about");
+        gameMenuAbout.addEventListener("click", function (e) {
+            gameMenu.style.display = "none";
+            aboutBox.style.display = "block";
         });
         var gameMenuRestart = document.getElementById("pm-game-menu-restart");
         gameMenuRestart.addEventListener("click", function (e) {

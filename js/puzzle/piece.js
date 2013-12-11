@@ -92,11 +92,11 @@ PM.Piece = (function () {
         
         // Draw strokes
         for (var i = this.primitives.length; i--; ) {
-            ctx.drawImage(this.primitives[i].stroke, this.primitives[i].x, this.primitives[i].y);
+            ctx.drawImage(this.primitives[i].stroke, this.primitives[i].x | 0, this.primitives[i].y | 0);
         }
         // Draw images
         for (var i = this.primitives.length; i--; ) {
-            ctx.drawImage(this.primitives[i].image, this.primitives[i].x, this.primitives[i].y);
+            ctx.drawImage(this.primitives[i].image, this.primitives[i].x | 0, this.primitives[i].y | 0);
         }
         
         // Restore state of the context

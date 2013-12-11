@@ -94,10 +94,10 @@ PM.creation = (function (PM) {
         
         var pieces = [];
         var tabs = randomizeTabs(rows, cols);
-        var ww = Math.floor(document.documentElement.clientWidth);
-        var hh = Math.floor(document.documentElement.clientWidth / image.width * image.height);
-        var w = Math.floor(ww / cols);
-        var h = Math.floor(hh / rows);
+        var ww = Math.ceil(document.documentElement.clientWidth);
+        var hh = Math.ceil(document.documentElement.clientWidth / image.width * image.height);
+        var w = Math.ceil(ww / cols);
+        var h = Math.ceil(hh / rows);
         
         console.log(image.width, image.height, ww, hh, w, h);
         

@@ -373,8 +373,8 @@ PM.creation = (function (PM) {
         // Source margin
         var sm = Math.min(Math.round(image.width / cols / 5), Math.round(image.height / rows / 5));
         // Tab tolerance value transformed to the source image's dimensions
-        var swTabTolerance = posCorr.tabTolerance / w * image.width;
-        var shTabTolerance = posCorr.tabTolerance / h * image.height;
+        var swTabTolerance = posCorr.tabTolerance / w * image.width / cols;
+        var shTabTolerance = posCorr.tabTolerance / h * image.height / rows;
         // How much to adjust the destination image
         var destinationAdjustment = { x: 0, y: 0, w: 0, h: 0 };
         // TODO: since most of the time property values of destinationAdjustment will remain 0, maybe use a prototype for it
@@ -415,7 +415,15 @@ PM.creation = (function (PM) {
         if (PM.debugShapes) {
             ctx.globalAlpha = 0.4;
         }
-        ctx.drawImage(image, sx, sy, sw, sh, posCorr.am + destinationAdjustment.x, posCorr.am + destinationAdjustment.y, canvas.width - 2 * posCorr.am + destinationAdjustment.w, canvas.height - 2 * posCorr.am + destinationAdjustment.h);
+        ctx.drawImage(image,
+                      Math.round(sx),
+                      Math.round(sy),
+                      Math.round(sw),
+                      Math.round(sh), 
+                      Math.round(posCorr.am + destinationAdjustment.x),
+                      Math.round(posCorr.am + destinationAdjustment.y),
+                      Math.round(canvas.width - 2 * posCorr.am + destinationAdjustment.w),
+                      Math.round(canvas.height - 2 * posCorr.am + destinationAdjustment.h));
         
         // Create stroke for the piece
         var stroke = createStroke(tabStatus, w, h);

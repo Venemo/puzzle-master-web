@@ -121,6 +121,7 @@ PM.ImageChooser = (function () {
         // Hides the image chooser UI
         that.hide = function () {
             chooserUi.style.display = "none";
+            chooserUi.scrollTop = 0;
         };
     };
     

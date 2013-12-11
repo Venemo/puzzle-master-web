@@ -37,7 +37,7 @@ body {
 }
 #pm-header-main {
     background: #a909a7;
-    box-shadow: rgba(0, 0, 0, 0.8) 0 0 5px;
+    box-shadow: rgba(0, 0, 0, 0.8) 0 0 3px;
 }
 #pm-imagechooser-list {
     padding: 5px;
@@ -56,7 +56,7 @@ body {
     box-sizing: border-box;
     border: 3px solid #fff;
     width: 100%;
-    box-shadow: rgba(0, 0, 0, 0.8) 0 0 5px;
+    box-shadow: rgba(0, 0, 0, 0.8) 0 0 3px;
 }
 .clearfix {
     clear: both;

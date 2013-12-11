@@ -11,6 +11,31 @@
 PM = typeof(PM) === "undefined" ? {} : PM;
 
 PM.ImageChooser = (function () {
+
+    // Wires up a picker dialog
+    var wireupPicker = function (picker, span) {
+        // Wireup cancel button
+        var cancel = picker.querySelector(".pm-cancel");
+        cancel.addEventListener("click", function (e) {
+            picker.style.display = "none";
+        });
+        
+        // Wireup picker buttons
+        var buttons = picker.querySelectorAll(".pm-picker-button");
+        var onClicked = function (e) {
+            var button = e.originalTarget;
+            span.innerHTML = button.innerHTML;
+            // TODO: persist value of span
+            picker.style.display = "none";
+        };
+        for (var i = buttons.length; i--; ) {
+            buttons[i].addEventListener("click", onClicked);
+        };
+        
+        return picker;
+    };
+
+    // Wires up the difficulty dialog and its features
     var wireupDifficultyDialog = function (difficultyDialog, callback) {
         // Check parameters
         if (typeof(difficultyDialog) === "undefined") {
@@ -22,6 +47,13 @@ PM.ImageChooser = (function () {
         
         // Initially hide
         difficultyDialog.style.display = "none";
+        
+        // Find rows and cols elements
+        var colsSpan = difficultyDialog.querySelector("#pm-cols-val");
+        var rowsSpan = difficultyDialog.querySelector("#pm-rows-val");
+        var colsPicker = wireupPicker(document.querySelector("#pm-cols-picker"), colsSpan);
+        var rowsPicker = wireupPicker(document.querySelector("#pm-rows-picker"), rowsSpan);
+        
         
         // Wireup cancel button
         var cancel = difficultyDialog.querySelector(".pm-cancel");
@@ -36,19 +68,30 @@ PM.ImageChooser = (function () {
             // Hide difficulty dialog
             difficultyDialog.style.display = "none";
             
-            // Find rows and cols elements
-            var colsSpan = difficultyDialog.querySelector("#pm-cols-val");
-            var rowsSpan = difficultyDialog.querySelector("#pm-rows-val");
-            
             // Call callback
             callback(Number(colsSpan.innerHTML), Number(rowsSpan.innerHTML));
         });
+        
+        // Wireup number picker buttons
+        var colsPickerButton = difficultyDialog.querySelector("#pm-cols-button");
+        colsPickerButton.addEventListener("click", function (e) {
+            colsPicker.style.display = "block";
+        });
+        var rowsPickerButton = difficultyDialog.querySelector("#pm-rows-button");
+        rowsPickerButton.addEventListener("click", function (e) {
+            rowsPicker.style.display = "block";
+        });
+        
+        return;
     };
-
+    
+    // Initializes the image chooser
     function ImageChooser (chosenCallback) {
         var chooserUi = document.getElementById("pm-imagechooser");
         var difficultyDialog = document.getElementById("pm-difficulty");
         var image = null;
+        
+        // TODO: load persisted values of colsSpan and rowsSpan
         
         wireupDifficultyDialog(difficultyDialog, function (cols, rows) {
             // Hide image chooser

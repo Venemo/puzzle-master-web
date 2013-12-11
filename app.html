@@ -51,8 +51,8 @@
             <section>
                 <h1>Difficulty</h1>
                 <ul>
-                    <li><button type="button" class="icon icon-dialog" style="padding: 0 1.2rem;">Columns <span id="pm-cols-val" style="display:block;float:right;">3</span></button></li>
-                    <li><button type="button" class="icon icon-dialog" style="padding: 0 1.2rem;">Rows <span id="pm-rows-val" style="display:block;float:right;">3</span></button></li>
+                    <li><button id="pm-cols-button" type="button" class="icon icon-dialog" style="padding: 0 1.2rem;">Columns <span id="pm-cols-val" style="display:block;float:right;">3</span></button></li>
+                    <li><button id="pm-rows-button" type="button" class="icon icon-dialog" style="padding: 0 1.2rem;">Rows <span id="pm-rows-val" style="display:block;float:right;">3</span></button></li>
                 </ul>
             </section>
             <menu>
@@ -70,7 +70,7 @@
                 <button type="button" class="pm-cancel">Cancel</button>
             </menu>
         </form>
-        <form id="pm-cols-picker" role="dialog" data-type="action" style="display: none;"
+        <form id="pm-cols-picker" role="dialog" data-type="action" style="display: none;">
             <header>Columns</header>
             <menu>
                 <button type="button" class="pm-picker-button">1</button>

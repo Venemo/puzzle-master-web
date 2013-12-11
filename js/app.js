@@ -68,9 +68,13 @@ var pmApp = (function () {
         e.preventDefault();
     });
 
-    var imageChooser = new PM.ImageChooser("pm-imagechooser", function (image) {
+    var imageChooser = new PM.ImageChooser(function (image, cols, rows) {
         console.log("starting game");
-        game = new PM.Game(image, 2, 3, renderLoop);
+        
+        mainCanvas.width = document.documentElement.clientWidth;
+        mainCanvas.height = document.documentElement.clientHeight;
+        
+        game = new PM.Game(image, rows, cols, renderLoop);
         renderLoop.start();
     });
     

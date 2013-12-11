@@ -3,17 +3,23 @@
 <head>
     <meta charset="utf-8">
     <title>Puzzle Master</title>
+    
+    <link rel="stylesheet" href="css/fxos/action_menu.css" />
+    <link rel="stylesheet" href="css/fxos/buttons.css" />
+    <link rel="stylesheet" href="css/fxos/confirm.css" />
+    <link rel="stylesheet" href="css/fxos/headers.css" />
+    
     <link rel="stylesheet" href="css/app.css" />
     
 </head>
 <body>
     
-    <div id="game-ui">
+    <div id="game-ui" class="pm-mainview">
         <canvas id="maincanvas"></canvas>
     </div>
     
-    <div id="pm-imagechooser">
-        <h1 id="pm-maintitle">Welcome, choose an image!</h1>
+    <section role="region" id="pm-imagechooser" class="pm-mainview">
+        <header id="pm-header-main"><h1>Welcome, choose an image!</h1></header>
         <div id="pm-imagechooser-list">
             <div class="pm-imagechooser-image">
                 <img src="images/image4.jpg" alt="image 1" />
@@ -41,7 +47,41 @@
             </div>
             <div class="clearfix">&nbsp;</div>
         </div>
-    </div>
+        <form id="pm-difficulty" role="dialog" data-type="confirm" style="display: none;">
+            <section>
+                <h1>Difficulty</h1>
+                <ul>
+                    <li><button type="button" class="icon icon-dialog" style="padding: 0 1.2rem;">Columns <span id="pm-cols-val" style="display:block;float:right;">3</span></button></li>
+                    <li><button type="button" class="icon icon-dialog" style="padding: 0 1.2rem;">Rows <span id="pm-rows-val" style="display:block;float:right;">3</span></button></li>
+                </ul>
+            </section>
+            <menu>
+                <button type="button" class="pm-cancel">Cancel</button>
+                <button type="button" class="recommend pm-play">Play</button>
+            </menu>
+        </form>
+        <form id="pm-rows-picker" role="dialog" data-type="action" style="display: none;">
+            <header>Rows</header>
+            <menu>
+                <button type="button" class="pm-picker-button">1</button>
+                <button type="button" class="pm-picker-button">2</button>
+                <button type="button" class="pm-picker-button">3</button>
+                <button type="button" class="pm-picker-button">4</button>
+                <button type="button" class="pm-cancel">Cancel</button>
+            </menu>
+        </form>
+        <form id="pm-cols-picker" role="dialog" data-type="action" style="display: none;"
+            <header>Columns</header>
+            <menu>
+                <button type="button" class="pm-picker-button">1</button>
+                <button type="button" class="pm-picker-button">2</button>
+                <button type="button" class="pm-picker-button">3</button>
+                <button type="button" class="pm-picker-button">4</button>
+                <button type="button" class="pm-picker-button">5</button>
+                <button type="button" class="pm-cancel">Cancel</button>
+            </menu>
+        </form>
+    </section>
     
     <script src="js/renderloop.js"></script>
     <script src="js/piece.js"></script>

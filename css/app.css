@@ -21,9 +21,9 @@ body {
 
 /* Game UI */
 
-#game-ui {
+#pm-game-ui {
 }
-#maincanvas {
+#pm-maincanvas {
     position: absolute;
     top: 0;
     left: 0;

@@ -14,9 +14,21 @@
 </head>
 <body>
     
-    <div id="game-ui" class="pm-mainview">
-        <canvas id="maincanvas"></canvas>
-    </div>
+    <section role="region" id="pm-game-ui" class="pm-mainview">
+        <canvas id="pm-maincanvas"></canvas>
+        <form id="pm-gamewon" role="dialog" data-type="confirm" style="display: none;">
+            <section>
+                <h1>You're a winner!</h1>
+                <p>
+                    Congratulations, you've solved the given puzzle!
+                </p>
+            </section>
+            <menu>
+                <button type="button" id="pm-choose-other">Choose other</button>
+                <button type="button" class="recommend" id="pm-play-again">Play again</button>
+            </menu>
+        </form>
+    </section>
     
     <section role="region" id="pm-imagechooser" class="pm-mainview">
         <header id="pm-header-main"><h1>Welcome, choose an image!</h1></header>
@@ -87,6 +99,7 @@
     <script src="js/piece.js"></script>
     <script src="js/creation.js"></script>
     <script src="js/game.js"></script>
+    <script src="js/game-ui.js"></script>
     <script src="js/imagechooser.js"></script>
     <script src="js/app.js"></script>
 </body>

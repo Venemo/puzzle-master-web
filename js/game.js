@@ -12,11 +12,12 @@ PM = typeof(PM) === "undefined" ? {} : PM;
 
 PM.Game = (function () {
     
-    var Game = function Game (image, rows, cols, renderLoop) {
+    var Game = function Game (image, cols, rows, renderLoop, onWon) {
         this.bigImage = image;
         this.rows = rows;
         this.cols = cols;
         this.renderLoop = renderLoop;
+        this.onWon = onWon;
         this.pieces = PM.creation.createPieces(image, this, rows, cols);
         
         var that = this;
@@ -151,8 +152,8 @@ PM.Game = (function () {
         
         var that = this;
         animY.setOnCompleted(function () {
-            // TODO: replace this with something better looking
-            alert("Congrats, you've won!");
+            // Call onWon callback
+            that.onWon && that.onWon();
         });
         
         this.renderLoop.markDirty();

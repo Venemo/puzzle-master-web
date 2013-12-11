@@ -11,10 +11,14 @@
 var pmApp = (function () {
     
     // Initialize game UI
-    var gameUi = new PM.GameUi();
+    var gameUi = new PM.GameUi(function () {
+        gameUi.hide();
+        imageChooser.show();
+    });
     
     // Initialize image chooser UI
     var imageChooser = new PM.ImageChooser(function (image, cols, rows) {
+        gameUi.show();
         gameUi.startGame(image, cols, rows);
     });
     

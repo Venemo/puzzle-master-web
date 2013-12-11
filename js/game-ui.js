@@ -11,17 +11,43 @@
 PM = typeof(PM) === "undefined" ? {} : PM;
 
 PM.GameUi = (function () {
+
+    var wireupWonDialog = function (wonDialog, gameUi, onChooseOther) {
+        // Wireup choose other button
+        var chooseOther = document.getElementById("pm-choose-other");
+        chooseOther.addEventListener("click", function (e) {
+            wonDialog.style.display = "none";
+            gameUi.hide();
+            onChooseOther && onChooseOther();
+        });
+        
+        // Wireup play again button
+        var playAgain = document.getElementById("pm-play-again");
+        playAgain.addEventListener("click", function (e) {
+            wonDialog.style.display = "none";
+            gameUi.restartGame();
+        });
+        
+        return wonDialog;
+    };
     
     // Initializes the game UI
-    function GameUi () {
+    function GameUi (onChooseOther) {
+        var gameUiElement = document.getElementById("pm-game-ui");
         var mainCanvas = document.getElementById("pm-maincanvas");
+        var wonDialog = wireupWonDialog(document.getElementById("pm-gamewon"), this, onChooseOther);
         var ctx = mainCanvas.getContext("2d");
         var game;
+        var chosenImage, chosenCols, chosenRows;
         var renderLoop = new PM.RenderLoop(function () {
             if (game) {
                 game.draw(ctx);
             }
         });
+        
+        var onWon = function () {
+            wonDialog.style.display = "block";
+        };
         
         var that = this;
         
@@ -79,13 +105,34 @@ PM.GameUi = (function () {
         
         // Starts the game
         that.startGame = function (image, cols, rows) {
+            // Set setting values
+            chosenImage = image;
+            chosenCols = cols;
+            chosenRows = rows;
+            
+            // "restart" the game
+            that.restartGame();
+        };
+        
+        // Restarts the game
+        that.restartGame = function () {
             console.log("starting game");
             
             mainCanvas.width = document.documentElement.clientWidth;
             mainCanvas.height = document.documentElement.clientHeight;
             
-            game = new PM.Game(image, rows, cols, renderLoop);
+            game = new PM.Game(chosenImage, chosenCols, chosenRows, renderLoop, onWon);
             renderLoop.start();
+        };
+        
+        // Shows the game UI
+        that.show = function () {
+            gameUiElement.style.display = "block";
+        };
+        
+        // Hides the game UI
+        that.hide = function () {
+            gameUiElement.style.display = "none";
         };
         
         // Expose the render loop (for debugging purposes)

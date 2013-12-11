@@ -93,6 +93,7 @@ PM.ImageChooser = (function () {
         
         // TODO: load persisted values of colsSpan and rowsSpan
         
+        // Wire up the difficulty dialog
         wireupDifficultyDialog(difficultyDialog, function (cols, rows) {
             // Hide image chooser
             chooserUi.style.display = "none";
@@ -100,6 +101,7 @@ PM.ImageChooser = (function () {
             chosenCallback(image, cols, rows);
         });
         
+        // Wire up clicking on an image
         chooserUi.addEventListener("click", function (e) {
             if (e.originalTarget instanceof HTMLImageElement) {
                 // Set chosen image
@@ -111,8 +113,14 @@ PM.ImageChooser = (function () {
         
         var that = this;
         
+        // Shows the image chooser UI
         that.show = function () {
             chooserUi.style.display = "block";
+        };
+        
+        // Hides the image chooser UI
+        that.hide = function () {
+            chooserUi.style.display = "none";
         };
     };
     

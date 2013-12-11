@@ -16,6 +16,7 @@
     
     <section role="region" id="pm-game-ui" class="pm-mainview" style="display: none;">
         <canvas id="pm-maincanvas"></canvas>
+        <button id="pm-game-menubutton" type="button"><img src="css/fxos/headers/images/icons/options@1.5x.png" alt="menu"/></button>
         <form id="pm-gamewon" role="dialog" data-type="confirm" style="display: none;">
             <section>
                 <h1>You're a winner!</h1>
@@ -26,6 +27,26 @@
             <menu>
                 <button type="button" id="pm-choose-other">Choose other</button>
                 <button type="button" class="recommend" id="pm-play-again">Play again</button>
+            </menu>
+        </form>
+        <form id="pm-game-menu" role="dialog" data-type="action" style="display: none;">
+            <header>Game menu</header>
+            <menu>
+                <button type="button" id="pm-game-menu-restart" class="danger">Restart</button>
+                <button type="button" id="pm-game-menu-surrender" class="danger">Surrender</button>
+                <button type="button" id="pm-game-menu-back">Continue game</button>
+            </menu>
+        </form>
+        <form id="pm-game-surrender" role="dialog" data-type="confirm" style="display: none;">
+            <section>
+                <h1>Are you sure?</h1>
+                <p>
+                    Do you really want to surrender this game?
+                </p>
+            </section>
+            <menu>
+                <button type="button" class="pm-cancel">No</button>
+                <button type="button" class="danger pm-confirm">Yes</button>
             </menu>
         </form>
     </section>

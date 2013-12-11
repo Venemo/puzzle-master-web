@@ -45,12 +45,52 @@ PM.GameUi = (function () {
             }
         });
         
+        var that = this;
+        
         var onWon = function () {
             wonDialog.style.display = "block";
         };
         
-        var that = this;
+        // Wireup "are you sure to surrender" dialog
+        var surrenderCallback = null;
+        var surrenderDialog = document.getElementById("pm-game-surrender");
+        var surrenderDialogCancel = surrenderDialog.querySelector(".pm-cancel");
+        surrenderDialogCancel.addEventListener("click", function (e) {
+            surrenderDialog.style.display = "none";
+        });
+        var surrenderDialogConfirm = surrenderDialog.querySelector(".pm-confirm");
+        surrenderDialogConfirm.addEventListener("click", function (e) {
+            surrenderDialog.style.display = "none";
+            surrenderCallback && surrenderCallback();
+        });
         
+        // Wireup game menu
+        var gameMenuButton = document.getElementById("pm-game-menubutton");
+        var gameMenu = document.getElementById("pm-game-menu");
+        gameMenuButton.addEventListener("click", function (e) {
+            gameMenu.style.display = "block";
+        });
+        var gameMenuBack = document.getElementById("pm-game-menu-back");
+        gameMenuBack.addEventListener("click", function (e) {
+            gameMenu.style.display = "none";
+        });
+        var gameMenuRestart = document.getElementById("pm-game-menu-restart");
+        gameMenuRestart.addEventListener("click", function (e) {
+            gameMenu.style.display = "none";
+            surrenderCallback = function () {
+                that.restartGame();
+            };
+            surrenderDialog.style.display = "block";
+        });
+        var gameMenuSurrender = document.getElementById("pm-game-menu-surrender");
+        gameMenuSurrender.addEventListener("click", function (e) {
+            surrenderCallback = function () {
+                onChooseOther && onChooseOther();
+                that.hide();
+            };
+            gameMenu.style.display = "none";
+            surrenderDialog.style.display = "block";
+        });
         
         // Wireup main canvas: touch events
         mainCanvas.addEventListener("touchstart", function (e) {

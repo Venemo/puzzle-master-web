@@ -28,6 +28,15 @@ var pmApp = (function () {
     aboutBoxCancel.addEventListener("click", function (e) {
         aboutBox.style.display = "none";
     });
+    if (PM.isFirefoxOS) {
+        document.getElementById("pm-authorlink").addEventListener("click", function (e) {
+            var activity = new MozActivity({
+                name: "view",
+                data: { type: "url", url: e.originalTarget.getAttribute("href") }
+            });
+            e.preventDefault();
+        });
+    }
     
     
     // Expose the objects (for debugging purposes)

@@ -1,6 +1,11 @@
 
 /* Basics */
 
+html {
+    /* This is a magic number that I pulled out from building blocks, without it all fonts look awfully big */
+    font-size: 62.5%;
+}
+
 div, body, canvas, img {
     padding: 0;
     margin: 0;

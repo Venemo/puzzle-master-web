@@ -56,7 +56,7 @@ PM.Game = (function () {
     };
     
     Game.prototype.draw = function (ctx) {
-        ctx.clearRect(0, 0, screen.width, screen.height);
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         
         for (var i = 0; i < this.pieces.length; i++) {
             this.pieces[i].draw(ctx);

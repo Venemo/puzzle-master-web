@@ -17,74 +17,74 @@ if (typeof(window.requestAnimationFrame) !== "function") {
 }
 
 PM.RenderLoop = (function () {
-    
+
     // RenderLoop ===========================================================================================
 
     function RenderLoop (callback) {
         if (typeof(callback) !== "function") {
             throw new Error("Invalid parameter: callback");
         }
-    
+
         this._callbacks = [callback];
     };
-    
+
     RenderLoop.prototype._isDirty = true;
     RenderLoop.prototype._requests = 0;
     RenderLoop.prototype._isRunning = null;
     RenderLoop.prototype._callbacks = null;
-    
+
     RenderLoop.prototype.addCallback = function (callback) {
         if (typeof(callback) !== "function")
             throw new Error("Invalid parameter: callback is not a function");
-        
+
         this._callbacks.push(callback);
     };
-    
+
     RenderLoop.prototype.removeCallback = function (callback) {
         if (typeof(callback) !== "function")
             throw new Error("Invalid parameter: callback is not a function");
-        
+
         var i = this._callbacks.indexOf(callback);
         if (i >= 0) {
             this._callbacks.splice(i, 1);
         }
     };
-    
+
     RenderLoop.prototype.start = function (addReq) {
         if (this._isRunning) {
             return;
         }
-        
+
         this._isRunning = true;
         loopFunc(this);
-        
+
         if (addReq) {
             this.addLoopRequest();
         }
     };
-    
+
     RenderLoop.prototype.stop = function () {
         this._isRunning = false;
     };
-    
+
     RenderLoop.prototype.addLoopRequest = function () {
         this._requests += 1;
         if (this._requests === 1) {
             this.start();
         }
     };
-    
+
     RenderLoop.prototype.removeLoopRequest = function () {
         this._requests = this._requests === 0 ? 0 : this._requests - 1;
         if (this._requests === 0) {
             this.stop();
         }
     };
-    
+
     RenderLoop.prototype.markDirty = function () {
         this._isDirty = true;
     };
-    
+
     RenderLoop.prototype.createNumberAnimation = function (duration, obj, prop, from, to) {
         var anim = new NumberAnimation(this, duration, obj, prop, from, to);
         return {
@@ -100,7 +100,7 @@ PM.RenderLoop = (function () {
             if (renderLoop._isDirty) {
                 //console.log("render loop is dirty");
                 renderLoop._isDirty = false;
-                
+
                 for (var i = renderLoop._callbacks.length; i--; ) {
                     renderLoop._callbacks[i] && renderLoop._callbacks[i](t);
                 }
@@ -113,9 +113,9 @@ PM.RenderLoop = (function () {
             }
         });
     };
-    
+
     // NumberAnimation ===========================================================================================
-    
+
     var NumberAnimation = function NumberAnimation (renderLoop, duration, obj, prop, from, to) {
         // Check parameters
         if (typeof(obj) !== "object" || !obj)
@@ -126,13 +126,13 @@ PM.RenderLoop = (function () {
             throw new Error("Invalid parameter: from");
         if (typeof(obj[prop]) !== "number")
             throw new Error("The given object doesn't have a number property with the given name.");
-        
+
         // Three-parameter version: from is the current state, to is the 3rd parameter
         if (typeof(to) === "undefined") {
             to = from;
             from = obj[prop];
         }
-    
+
         // Set instance properties
         this.obj = obj;
         this.prop = prop;
@@ -142,13 +142,13 @@ PM.RenderLoop = (function () {
         this.duration = duration;
         this.renderLoopCallback = NumberAnimation.createRenderLoopCallback(this);
     };
-    
+
     NumberAnimation.createRenderLoopCallback = function (that) {
         return function (t) {
             that.tick(t);
         };
     };
-    
+
     NumberAnimation.prototype.from = 0;
     NumberAnimation.prototype.to = 0;
     NumberAnimation.prototype.obj = 0;
@@ -158,42 +158,42 @@ PM.RenderLoop = (function () {
     NumberAnimation.prototype.prevTime = 0;
     NumberAnimation.prototype.elapsed = 0;
     NumberAnimation.prototype.onCompleted = null;
-    
+
     NumberAnimation.prototype.start = function () {
         if (this.duration === 0)
             return;
-        
+
         this.renderLoop.addCallback(this.renderLoopCallback);
         this.renderLoop.addLoopRequest();
     };
-    
+
     NumberAnimation.prototype.tick = function (t) {
         //console.log("animation tick called");
         this.renderLoop.markDirty();
-        
+
         if (!this.prevTime) {
             this.prevTime = t;
             this.obj[this.prop] = this.from;
             this.speed = (this.to - this.from) / this.duration;
-            
+
             return;
         }
-        
+
         var dt = t - this.prevTime;
         this.prevTime = t;
         this.obj[this.prop] += this.speed * dt;
         this.elapsed += dt;
-        
+
         if (this.elapsed >= this.duration) {
             //console.log("animation tick: stopping animation");
-            
+
             // Set property to its final value
             this.obj[this.prop] = this.to;
-            
+
             // Remove animation from render loop
             this.renderLoop.removeCallback(this.renderLoopCallback);
             this.renderLoop.removeLoopRequest();
-            
+
             // Take care of the onCompleted callback by abusing the render loop callbacks
             // NOTE: this is done to ensure that everything's been painted properly by the time onCompleted is called
             if (this.onCompleted) {
@@ -203,7 +203,7 @@ PM.RenderLoop = (function () {
                     that.renderLoop.removeCallback(cb1);
                     // Mark as dirty
                     that.renderLoop.markDirty();
-                    
+
                     var cb2 = function () {
                         // Mark as dirty
                         that.renderLoop.markDirty();
@@ -212,20 +212,17 @@ PM.RenderLoop = (function () {
                         // Execute the actual callback
                         that.onCompleted();
                     }
-                    
+
                     // Add cb2
                     that.renderLoop._callbacks.unshift(cb2);
                 };
-                
+
                 // Add cb1
                 this.renderLoop._callbacks.unshift(cb1);
             }
         }
     };
-    
+
     return RenderLoop;
 
 })();
-
-
-

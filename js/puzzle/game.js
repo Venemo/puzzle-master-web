@@ -11,7 +11,7 @@
 PM = typeof(PM) === "undefined" ? {} : PM;
 
 PM.Game = (function () {
-    
+
     var Game = function Game (image, cols, rows, renderLoop, onWon) {
         this.bigImage = image;
         this.rows = rows;
@@ -19,22 +19,22 @@ PM.Game = (function () {
         this.renderLoop = renderLoop;
         this.onWon = onWon;
         this.pieces = PM.creation.createPieces(image, this, rows, cols);
-        
+
         var that = this;
-        
+
         setTimeout(function() { that.shuffle(600); }, 500);
         setTimeout(function() { that.shuffle(600); }, 1200);
         setTimeout(function() { that.isInteractive = true; }, 1900);
     };
-    
+
     Game.prototype.isInteractive = false;
     Game.prototype.isWon = false;
-    
+
     Game.prototype.shuffle = function (duration) {
         for (var i = 0; i < this.pieces.length; i++) {
             var endx = Math.round(Math.random() * (document.documentElement.clientWidth - 100) + 50);
             var endy = Math.round(Math.random() * (document.documentElement.clientHeight - 100) + 50);
-            
+
             var animX = this.renderLoop.createNumberAnimation(duration, this.pieces[i], "x", endx);
             var animY = this.renderLoop.createNumberAnimation(duration, this.pieces[i], "y", endy);
             animX.start();
@@ -42,7 +42,7 @@ PM.Game = (function () {
         }
         this.renderLoop.markDirty();
     };
-    
+
     Game.prototype.findPiece = function (x, y) {
         //console.log(JSON.stringify(this.pieces));
         for (var i = this.pieces.length; i --; ) {
@@ -54,20 +54,20 @@ PM.Game = (function () {
         }
         return null;
     };
-    
+
     Game.prototype.draw = function (ctx) {
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        
+
         for (var i = 0; i < this.pieces.length; i++) {
             this.pieces[i].draw(ctx);
         }
     };
-    
+
     Game.prototype.reactToTouchStart = function (touches) {
         if (!this.isInteractive) {
             return;
         }
-    
+
         for (var i = 0; i < touches.length; i++) {
             var grabbers = this.pieces.filter(function(p) { return p.grabbedTouches.some(function(id) { id === touches[i].identifier }); });
             //console.log("touch start");
@@ -80,7 +80,7 @@ PM.Game = (function () {
                     console.log("touch start", "piece found", piece.px, piece.py);
                     piece.grabbedTouches.push(touches[i].identifier);
                     piece.startDrag(touches[i].clientX, touches[i].clientY);
-                    
+
                     // Raise piece to top
                     var index = this.pieces.indexOf(piece);
                     //console.log(index);
@@ -92,12 +92,12 @@ PM.Game = (function () {
         }
         this.renderLoop.markDirty();
     };
-    
+
     Game.prototype.reactToTouchEnd = function (touches) {
         if (!this.isInteractive) {
             return;
         }
-        
+
         for (var i = 0; i < this.pieces.length; i++) {
             this.pieces[i].grabbedTouches = [];
         }
@@ -113,16 +113,16 @@ PM.Game = (function () {
 //        }
         this.renderLoop.markDirty();
     };
-    
+
     Game.prototype.reactToTouchMove = function (touches) {
         if (!this.isInteractive) {
             return;
         }
-        
+
         var shouldRedraw = false;
         for (var i = 0; i < touches.length; i++) {
             //console.log("reaction to touch", i, "of", touches.length, touches[i].identifier);
-            
+
             var grabbers = this.pieces.filter(function(p) {
                 return p.grabbedTouches.some(function(id) { return id === touches[i].identifier; });
             });
@@ -137,28 +137,28 @@ PM.Game = (function () {
             this.renderLoop.markDirty();
         }
     };
-    
+
     Game.prototype.winNow = function () {
         // Set flags
         this.isWon = true;
         this.isInteractive = false;
-        
+
         // Animate the piece to its supposed position
         var duration = 900;
         var animX = this.renderLoop.createNumberAnimation(duration, this.pieces[0], "x", this.pieces[0].supposedPosition.x);
         var animY = this.renderLoop.createNumberAnimation(duration, this.pieces[0], "y", this.pieces[0].supposedPosition.y);
         animX.start();
         animY.start();
-        
+
         var that = this;
         animY.setOnCompleted(function () {
             // Call onWon callback
             that.onWon && that.onWon();
         });
-        
+
         this.renderLoop.markDirty();
     };
-    
+
     return Game;
-    
+
 })();

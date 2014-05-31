@@ -9,19 +9,19 @@
 // Copyright 2013, Timur Kristóf
 
 var pmApp = (function () {
-    
+
     // Initialize game UI
     var gameUi = new PM.GameUi(function () {
         gameUi.hide();
         imageChooser.show();
     });
-    
+
     // Initialize image chooser UI
     var imageChooser = new PM.ImageChooser(function (image, cols, rows) {
         gameUi.show();
         gameUi.startGame(image, cols, rows);
     });
-    
+
     // Wireup about box
     var aboutBox = document.getElementById("pm-aboutbox");
     var aboutBoxCancel = aboutBox.querySelector(".pm-cancel");
@@ -37,13 +37,12 @@ var pmApp = (function () {
             e.preventDefault();
         });
     }
-    
-    
+
+
     // Expose the objects (for debugging purposes)
     return {
         gameUi: gameUi,
         imageChooser: imageChooser
     };
-    
-})();
 
+})();

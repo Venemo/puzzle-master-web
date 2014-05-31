@@ -17,14 +17,14 @@ PM.isFirefoxOS = /Mobile;.*Firefox\/(\d+)/.test(navigator.userAgent);
 // Firefox OS specific stuff
 if (PM.isFirefoxOS) {
     // Lock orientation to landscape
-    
+
     window.screen.mozLockOrientation("landscape");
-    
+
     window.screen.onorientationchange = function () {
         window.screen.mozUnlockOrientation();
         window.screen.mozLockOrientation("landscape");
     };
-    
+
     document.addEventListener("visibilityChange", function (e) {
         if (!document.hidden) {
             window.screen.mozUnlockOrientation();
@@ -32,4 +32,3 @@ if (PM.isFirefoxOS) {
         }
     });
 }
-

@@ -20,17 +20,17 @@ PM.GameUi = (function () {
             gameUi.hide();
             onChooseOther && onChooseOther();
         });
-        
+
         // Wireup play again button
         var playAgain = document.getElementById("pm-play-again");
         playAgain.addEventListener("click", function (e) {
             wonDialog.style.display = "none";
             gameUi.restartGame();
         });
-        
+
         return wonDialog;
     };
-    
+
     // Initializes the game UI
     function GameUi (onChooseOther) {
         var gameUiElement = document.getElementById("pm-game-ui");
@@ -45,13 +45,13 @@ PM.GameUi = (function () {
                 game.draw(ctx);
             }
         });
-        
+
         var that = this;
-        
+
         var onWon = function () {
             wonDialog.style.display = "block";
         };
-        
+
         // Wireup "are you sure to surrender" dialog
         var surrenderCallback = null;
         var surrenderDialog = document.getElementById("pm-game-surrender");
@@ -64,7 +64,7 @@ PM.GameUi = (function () {
             surrenderDialog.style.display = "none";
             surrenderCallback && surrenderCallback();
         });
-        
+
         // Wireup game menu
         var gameMenuButton = document.getElementById("pm-game-menubutton");
         var gameMenu = document.getElementById("pm-game-menu");
@@ -97,26 +97,26 @@ PM.GameUi = (function () {
             gameMenu.style.display = "none";
             surrenderDialog.style.display = "block";
         });
-        
+
         // Wireup main canvas: touch events
         mainCanvas.addEventListener("touchstart", function (e) {
             if (!game)
                 return;
-            
+
             renderLoop.addLoopRequest();
             game.reactToTouchStart(e.touches);
         });
         mainCanvas.addEventListener("touchend", function (e) {
             if (!game)
                 return;
-                
+
             game.reactToTouchEnd(e.touches);
             renderLoop.removeLoopRequest();
         });
         mainCanvas.addEventListener("touchmove", function (e) {
             if (!game)
                 return;
-                
+
             game.reactToTouchMove(e.touches);
         });
 
@@ -124,76 +124,75 @@ PM.GameUi = (function () {
         mainCanvas.addEventListener("mousedown", function (e) {
             if (!game)
                 return;
-                
+
             renderLoop.addLoopRequest();
             game.reactToTouchStart([{ clientX: e.clientX, clientY: e.clientY }]);
         });
         mainCanvas.addEventListener("mouseup", function (e) {
             if (!game)
                 return;
-                
+
             game.reactToTouchEnd([{ clientX: e.clientX, clientY: e.clientY }]);
             renderLoop.removeLoopRequest();
         });
         mainCanvas.addEventListener("mousemove", function (e) {
             if (!game)
                 return;
-                
+
             game.reactToTouchMove([{ clientX: e.clientX, clientY: e.clientY }]);
         });
         mainCanvas.addEventListener("contextmenu", function (e) {
             if (!game)
                 return;
-                
+
             // Disallow context menu (right click means rotate)
             e.preventDefault();
         });
-        
+
         // Starts the game
         that.startGame = function (image, cols, rows) {
             // Set setting values
             chosenImage = image;
             chosenCols = cols;
             chosenRows = rows;
-            
+
             // "restart" the game
             that.restartGame();
         };
-        
+
         // Restarts the game
         that.restartGame = function () {
             console.log("starting game");
-            
+
             mainCanvas.width = document.documentElement.clientWidth;
             mainCanvas.height = document.documentElement.clientHeight;
-            
+
             game = new PM.Game(chosenImage, chosenCols, chosenRows, renderLoop, onWon);
             renderLoop.start();
         };
-        
+
         // Shows the game UI
         that.show = function () {
             gameUiElement.style.display = "block";
         };
-        
+
         // Hides the game UI
         that.hide = function () {
             gameUiElement.style.display = "none";
         };
-        
+
         // Expose the render loop (for debugging purposes)
         that.getRenderLoop = function () {
             return renderLoop;
         };
-        
+
         // Expose the game object (for debugging purposes)
         that.getGameObj = function () {
             return game;
         };
-        
-    };
-    
-    return GameUi;
-    
-})();
 
+    };
+
+    return GameUi;
+
+})();

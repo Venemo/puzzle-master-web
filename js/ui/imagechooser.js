@@ -19,7 +19,7 @@ PM.ImageChooser = (function () {
         cancel.addEventListener("click", function (e) {
             picker.style.display = "none";
         });
-        
+
         // Wireup picker buttons
         var buttons = picker.querySelectorAll(".pm-picker-button");
         var onClicked = function (e) {
@@ -31,7 +31,7 @@ PM.ImageChooser = (function () {
         for (var i = buttons.length; i--; ) {
             buttons[i].addEventListener("click", onClicked);
         };
-        
+
         return picker;
     };
 
@@ -44,34 +44,34 @@ PM.ImageChooser = (function () {
         if (typeof(callback) === "undefined") {
             throw new Error("Invalid parameter: callback");
         }
-        
+
         // Initially hide
         difficultyDialog.style.display = "none";
-        
+
         // Find rows and cols elements
         var colsSpan = difficultyDialog.querySelector("#pm-cols-val");
         var rowsSpan = difficultyDialog.querySelector("#pm-rows-val");
         var colsPicker = wireupPicker(document.querySelector("#pm-cols-picker"), colsSpan);
         var rowsPicker = wireupPicker(document.querySelector("#pm-rows-picker"), rowsSpan);
-        
-        
+
+
         // Wireup cancel button
         var cancel = difficultyDialog.querySelector(".pm-cancel");
         cancel.addEventListener("click", function (e) {
             // Hide difficulty dialog
             difficultyDialog.style.display = "none";
         });
-        
+
         // Wireup play button
         var play = difficultyDialog.querySelector(".pm-play");
         play.addEventListener("click", function (e) {
             // Hide difficulty dialog
             difficultyDialog.style.display = "none";
-            
+
             // Call callback
             callback(Number(colsSpan.innerHTML), Number(rowsSpan.innerHTML));
         });
-        
+
         // Wireup number picker buttons
         var colsPickerButton = difficultyDialog.querySelector("#pm-cols-button");
         colsPickerButton.addEventListener("click", function (e) {
@@ -81,10 +81,10 @@ PM.ImageChooser = (function () {
         rowsPickerButton.addEventListener("click", function (e) {
             rowsPicker.style.display = "block";
         });
-        
+
         return;
     };
-    
+
     // Initializes the image chooser
     function ImageChooser (chosenCallback) {
         var chooserUi = document.getElementById("pm-imagechooser");
@@ -92,9 +92,9 @@ PM.ImageChooser = (function () {
         var aboutBox = document.getElementById("pm-aboutbox");
         var optionsButton = document.getElementById("pm-imagechooser-options");
         var image = null;
-        
+
         // TODO: load persisted values of colsSpan and rowsSpan
-        
+
         // Wire up the difficulty dialog
         wireupDifficultyDialog(difficultyDialog, function (cols, rows) {
             // Hide image chooser
@@ -102,12 +102,12 @@ PM.ImageChooser = (function () {
             // Call callback
             chosenCallback(image, cols, rows);
         });
-        
+
         // Wire up options button
         optionsButton.addEventListener("click", function (e) {
             aboutBox.style.display = "block";
         });
-        
+
         // Wire up clicking on an image
         chooserUi.addEventListener("click", function (e) {
             if (e.originalTarget instanceof HTMLImageElement) {
@@ -117,22 +117,21 @@ PM.ImageChooser = (function () {
                 difficultyDialog.style.display = "block";
             }
         });
-        
+
         var that = this;
-        
+
         // Shows the image chooser UI
         that.show = function () {
             chooserUi.style.display = "block";
             chooserUi.scrollTop = 0;
         };
-        
+
         // Hides the image chooser UI
         that.hide = function () {
             chooserUi.scrollTop = 0;
             chooserUi.style.display = "none";
         };
     };
-    
+
     return ImageChooser;
 })();
-

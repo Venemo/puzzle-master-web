@@ -2,8 +2,6 @@
 /* Basics */
 
 html {
-    /* This is a magic number that I pulled out from building blocks, without it all fonts look awfully big */
-    font-size: 62.5%;
 }
 
 div, body, canvas, img {
@@ -44,10 +42,11 @@ a {
     position: absolute;
     right: -1px;
     top: -1px;
-    width: 50px;
-    height: 47px;
+    width: 6rem;
+    height: 3.5rem;
     padding: 7px 0 0 0;
-    text-align: center;
+    text-align: center;border-radius: 0;
+    border-bottom-left-radius: 1rem;
 }
 
 /* Image chooser UI */
@@ -87,25 +86,13 @@ a {
 
 /* Difficulty UI */
 
-#pm-gamedifficulty {
-    /*display: none;*/
-    background: rgba(0, 0, 0, 0.6);
+#pm-cols-button, #pm-rows-button {
+    padding: 0 1.2rem;
+    background: #ddd;
+    position: relative;
 }
-.pm-dialog {
-    background: #fff;
-    color: #000;
+#pm-cols-val, #pm-rows-val {
     position: absolute;
-    left: 10%;
-    right: 10%;
-    top: 10%;
-    bottom: 10%;
-    padding: 15px;
-    overflow-y: scroll;
+    right: 3rem;
+    font-weight: bold;
 }
-.pm-dialog h1 {
-    margin: 0;
-    padding: 10px;
-}
-
-
-

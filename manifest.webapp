@@ -7,6 +7,7 @@
     "256": "/images/puzzle-master.png"
   },
   "orientation": ["landscape"],
+  "fullscreen": "true",
   "developer": {
     "name": "Timur Kristóf"
   },

@@ -3,18 +3,18 @@
 <head>
     <meta charset="utf-8">
     <title>Puzzle Master</title>
-    
+
     <link rel="stylesheet" href="css/fxos/action_menu.css" />
     <link rel="stylesheet" href="css/fxos/buttons.css" />
     <link rel="stylesheet" href="css/fxos/confirm.css" />
     <link rel="stylesheet" href="css/fxos/headers.css" />
-    
+
     <link rel="stylesheet" href="css/app.css" />
-    
+
     <script src="js/ui/pre-init.js"></script>
 </head>
 <body>
-    
+
     <section role="region" id="pm-game-ui" class="pm-mainview" style="display: none;">
         <canvas id="pm-maincanvas"></canvas>
         <button id="pm-game-menubutton" type="button"><img src="css/fxos/headers/images/icons/options@1.5x.png" alt="menu"/></button>
@@ -52,7 +52,7 @@
             </menu>
         </form>
     </section>
-    
+
     <section role="region" id="pm-imagechooser" class="pm-mainview">
         <header id="pm-header-main">
             <menu type="toolbar">
@@ -119,13 +119,13 @@
             <div class="clearfix">&nbsp;</div>
         </div>
     </section>
-    
+
     <form id="pm-difficulty" role="dialog" data-type="confirm" style="display: none;">
         <section>
             <h1>Difficulty</h1>
             <ul>
-                <li><button id="pm-cols-button" type="button" class="icon icon-dialog" style="padding: 0 1.2rem;">Columns <span id="pm-cols-val" style="display:block;float:right;">3</span></button></li>
-                <li><button id="pm-rows-button" type="button" class="icon icon-dialog" style="padding: 0 1.2rem;">Rows <span id="pm-rows-val" style="display:block;float:right;">3</span></button></li>
+                <li><button id="pm-cols-button" type="button" class="icon icon-dialog">Columns <span id="pm-cols-val">3</span></button></li>
+                <li><button id="pm-rows-button" type="button" class="icon icon-dialog">Rows <span id="pm-rows-val">3</span></button></li>
             </ul>
         </section>
         <menu>
@@ -166,7 +166,7 @@
             <button type="button" class="pm-cancel">Ok</button>
         </menu>
     </form>
-    
+
     <script src="js/renderloop.js"></script>
     <script src="js/puzzle/piece.js"></script>
     <script src="js/puzzle/creation.js"></script>
